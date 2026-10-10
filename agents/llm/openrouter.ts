@@ -10,6 +10,9 @@ export interface OpenRouterOptions {
 
 export async function callLLM(options: OpenRouterOptions): Promise<string> {
   if (options.mockMode) {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('MOCK LLM calls are only allowed during automated testing (NODE_ENV=test).');
+    }
     console.log(`[Mock OpenRouter] Generating response for model: ${options.model}`);
     return await generateMockResponse(options);
   }
@@ -98,6 +101,9 @@ async function generateMockResponse(options: OpenRouterOptions): Promise<string>
 
 export async function generateImage(prompt: string, model: string, mockMode: boolean): Promise<string> {
   if (mockMode) {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('MOCK LLM calls are only allowed during automated testing (NODE_ENV=test).');
+    }
     return 'https://via.placeholder.com/800x600?text=' + encodeURIComponent(prompt.substring(0, 50));
   }
   

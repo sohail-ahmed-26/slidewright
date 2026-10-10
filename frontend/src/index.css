@@ -6,79 +6,89 @@
 
 @layer base {
   :root {
-    --background: 180 14.3% 97.1%; /* #F6F9F9 */
-    --foreground: 175.7 27.5% 9.8%; /* #12201F */
+    --background: 222 100% 98%; /* #F5F8FF */
+    --foreground: 223 68% 7%; /* #060D1F */
+    
     --card: 0 0% 100%; /* #FFFFFF */
-    --card-foreground: 175.7 27.5% 9.8%;
+    --card-foreground: 223 68% 7%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 175.7 27.5% 9.8%;
+    --popover-foreground: 223 68% 7%;
     
-    --primary: 178.5 78.4% 40.2%; /* #16B7B3 */
-    --primary-foreground: 0 0% 100%;
+    --primary: 223 100% 59%; /* #2F6BFF */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
     
-    --secondary: 180 13.8% 94.3%; /* #EEF3F3 */
-    --secondary-foreground: 175.7 27.5% 9.8%;
+    --secondary: 223 100% 96%; /* #EAF0FF */
+    --secondary-foreground: 223 68% 7%;
     
-    --muted: 180 13.8% 94.3%;
-    --muted-foreground: 180 9.5% 41.2%; /* #5F7373 */
+    --muted: 223 100% 96%;
+    --muted-foreground: 221 27% 40%; /* #4A5B80 */
     
-    --accent: 180 13.8% 94.3%;
-    --accent-foreground: 175.7 27.5% 9.8%;
+    --accent: 223 100% 96%;
+    --accent-foreground: 223 68% 7%;
     
-    --destructive: 0 73% 42%; /* #B91C1C */
+    --destructive: 0 84% 60%; /* #EF4444 */
     --destructive-foreground: 0 0% 100%;
     
-    --success: 142 71% 29%; /* #15803D */
+    --success: 142 71% 45%; /* #22C55E */
     --success-foreground: 0 0% 100%;
     
-    --warning: 26 90% 37%; /* #B45309 */
+    --warning: 38 92% 50%; /* #F59E0B */
     --warning-foreground: 0 0% 100%;
     
-    --info: 224 76% 48%; /* #1D4ED8 */
+    --info: 217 91% 60%; /* #3B82F6 */
     --info-foreground: 0 0% 100%;
     
-    --border: 180 11.1% 89.6%; /* #E1E8E8 */
-    --input: 180 11.1% 89.6%;
-    --ring: 178.5 78.4% 40.2%;
+    --draft: 215 25% 65%; /* #94A3B8 */
+    --draft-foreground: 0 0% 100%;
+
+    --border: 219 53% 88%; /* #D0DBF0 */
+    --input: 219 53% 88%;
+    --ring: 222 100% 68%; /* #5B8DFF */
     
-    --radius: 0.5rem; /* 8px for inputs/buttons, we'll manually apply 12px for cards */
+    --radius: 0.625rem; /* 10px */
   }
 
   .dark {
-    --background: 174 33.3% 5.9%; /* #0A1413 */
-    --foreground: 174 26.3% 92.2%; /* #E6F0EF */
-    --card: 175 28.6% 8.2%; /* #0F1B1A */
-    --card-foreground: 174 26.3% 92.2%;
-    --popover: 175 28.6% 8.2%;
-    --popover-foreground: 174 26.3% 92.2%;
+    --background: 223 68% 7%; /* #060D1F */
+    --foreground: 223 100% 96%; /* #EAF0FF */
     
-    --primary: 177.6 60% 52.4%; /* #3CCFC9 */
-    --primary-foreground: 174 33.3% 5.9%;
+    --card: 222 63% 12%; /* #0B1630 */
+    --card-foreground: 223 100% 96%;
     
-    --secondary: 176.8 23.8% 15.5%; /* Using border color for subtle bg in dark mode */
-    --secondary-foreground: 174 26.3% 92.2%;
+    --popover: 222 63% 12%;
+    --popover-foreground: 223 100% 96%;
     
-    --muted: 176.8 23.8% 15.5%;
-    --muted-foreground: 180 9.5% 61.2%; /* Lighter muted text */
+    --primary: 223 100% 59%; /* #2F6BFF */
+    --primary-foreground: 0 0% 100%;
     
-    --accent: 176.8 23.8% 15.5%;
-    --accent-foreground: 174 26.3% 92.2%;
+    --secondary: 222 60% 15%; /* #101E3F */
+    --secondary-foreground: 223 100% 96%;
     
-    --destructive: 0 73% 42%;
+    --muted: 222 60% 15%;
+    --muted-foreground: 222 33% 71%; /* #9AAAD0 */
+    
+    --accent: 222 60% 15%;
+    --accent-foreground: 223 100% 96%;
+    
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
-    --success: 142 71% 29%;
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
     
-    --warning: 26 90% 37%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     
-    --info: 224 76% 48%;
+    --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
     
-    --border: 176.8 23.8% 15.5%; /* #1E3130 */
-    --input: 176.8 23.8% 15.5%;
-    --ring: 177.6 60% 52.4%;
+    --draft: 215 25% 65%;
+    --draft-foreground: 0 0% 100%;
+
+    --border: 223 49% 21%; /* #1B2A4F */
+    --input: 223 49% 21%;
+    --ring: 222 100% 68%; /* #5B8DFF */
   }
 }
 
@@ -94,7 +104,6 @@
   }
 }
 
-/* Custom Spacing & Typography */
 @layer utilities {
   .text-12 { font-size: 12px; line-height: 16px; }
   .text-13 { font-size: 13px; line-height: 18px; }
@@ -102,7 +111,7 @@
   .text-16 { font-size: 16px; line-height: 24px; }
   .text-20 { font-size: 20px; line-height: 28px; }
   .text-24 { font-size: 24px; line-height: 32px; }
+  .text-28 { font-size: 28px; line-height: 36px; }
   .text-32 { font-size: 32px; line-height: 40px; }
-  
-  .space-4 { padding/margin: 4px; } /* will just use tw classes like p-1, p-2 etc mapping to these */
+  .text-40 { font-size: 40px; line-height: 48px; }
 }

@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Deck, useDeckStore } from '../store/useDeckStore';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 import { SlideThumb } from './slide/SlideThumb';
+import { cn } from '../lib/utils';
 
 export function formatRelative(dateString: string) {
   const diff = Date.now() - new Date(dateString).getTime();
@@ -43,11 +44,7 @@ export function DeckCard({ deck }: { deck: Deck }) {
             </div>
           )}
           
-          <div className="absolute top-2 left-2">
-             <Badge variant="secondary" className={statusColor}>
-                {deck.status}
-             </Badge>
-          </div>
+
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
              <Button size="icon" variant="secondary" className="h-8 w-8 shadow-sm rounded-full" onClick={(e) => { e.stopPropagation(); navigate(`/decks/${deck.id}/present`); }}>
                 <Play className="h-4 w-4" fill="currentColor" />
@@ -59,7 +56,10 @@ export function DeckCard({ deck }: { deck: Deck }) {
         <div className="p-4 flex flex-col flex-1">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h3 className="font-semibold text-base line-clamp-1">{deck.title}</h3>
+              <Badge variant="secondary" className={cn("mb-2 text-[10px] font-medium tracking-wide uppercase px-2 py-0.5", statusColor)}>
+                {deck.status}
+              </Badge>
+              <h3 className="font-semibold text-base line-clamp-1 text-foreground">{deck.title}</h3>
               <p className="text-xs text-muted-foreground mt-1">
                 {formatRelative(deck.createdAt)} • {deck.slides?.length || 0} slides
               </p>

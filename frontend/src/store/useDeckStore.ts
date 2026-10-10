@@ -1,9 +1,15 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { FIXTURES } from '@slidewright/shared/src/fixtures';
+import { Slide as SharedSlide } from '@slidewright/shared/src/schemas/visuals';
 
-export type Deck = typeof FIXTURES.decks[0];
-export type Slide = Deck['slides'][0];
+export type Deck = {
+  id: string;
+  title: string;
+  status: string;
+  createdAt: string;
+  slides: Slide[];
+  theme?: any;
+};
+export type Slide = SharedSlide & { id: string };
 
 interface DeckState {
   decks: Deck[];
@@ -28,9 +34,8 @@ interface DeckState {
 }
 
 export const useDeckStore = create<DeckState>()(
-  persist(
-    (set, get) => ({
-      decks: [...FIXTURES.decks],
+  (set, get) => ({
+    decks: [],
   history: [],
   future: [],
 
@@ -136,22 +141,5 @@ export const useDeckStore = create<DeckState>()(
         return { ...d, slides: result };
       })
     }));
-  }
-    }),
-    {
-      name: 'slidewright-deck-store',
-      version: 2,
-      migrate: (persistedState: any, version: number) => {
-        if (version === 0 || version === 1) {
-          // Reset to fixtures due to massive design system changes
-          return {
-            decks: [...FIXTURES.decks],
-            history: [],
-            future: []
-          };
-        }
-        return persistedState;
-      }
-    }
-  )
+  }))
 );

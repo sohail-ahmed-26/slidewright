@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 
 interface SettingsState {
-  openRouterKeyStatus: 'set' | 'not_set';
-  mockMode: boolean;
+  openRouterKeyStatus: 'valid' | 'missing' | 'loading';
   simulateFailure: boolean;
   defaultTextModel: string;
   defaultVisionModel: string;
@@ -10,19 +9,18 @@ interface SettingsState {
   theme: 'light' | 'dark' | 'system';
   density: 'comfortable' | 'compact';
   
-  setOpenRouterKeyStatus: (status: 'set' | 'not_set') => void;
-  setMockMode: (val: boolean) => void;
+  setOpenRouterKeyStatus: (status: 'valid' | 'missing' | 'loading') => void;
   setSimulateFailure: (val: boolean) => void;
   setDefaultTextModel: (model: string) => void;
   setDefaultVisionModel: (model: string) => void;
   setDefaultImageModel: (model: string) => void;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   setDensity: (density: 'comfortable' | 'compact') => void;
+  loadSettings: () => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
-  openRouterKeyStatus: 'not_set',
-  mockMode: true,
+  openRouterKeyStatus: 'loading',
   simulateFailure: false,
   defaultTextModel: 'google/gemini-2.5-flash',
   defaultVisionModel: 'google/gemini-2.5-flash',
@@ -31,11 +29,23 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   density: 'comfortable',
 
   setOpenRouterKeyStatus: (openRouterKeyStatus) => set({ openRouterKeyStatus }),
-  setMockMode: (mockMode) => set({ mockMode }),
   setSimulateFailure: (simulateFailure) => set({ simulateFailure }),
   setDefaultTextModel: (defaultTextModel) => set({ defaultTextModel }),
   setDefaultVisionModel: (defaultVisionModel) => set({ defaultVisionModel }),
   setDefaultImageModel: (defaultImageModel) => set({ defaultImageModel }),
   setTheme: (theme) => set({ theme }),
   setDensity: (density) => set({ density }),
+  
+  loadSettings: async () => {
+    try {
+      const { api } = await import('../lib/api');
+      const settings = await api.getSettings();
+      set((s) => ({
+        ...s,
+        ...settings,
+      }));
+    } catch (e) {
+      console.error('Failed to load settings:', e);
+    }
+  }
 }));

@@ -61,33 +61,35 @@ export function NewDeck() {
   return (
     <div className="flex-1 overflow-auto bg-background flex justify-center">
       <div className="w-full max-w-[1200px] flex flex-col h-full relative">
-        <div className="p-8 pb-4">
-          <h1 className="text-3xl font-bold tracking-tight">Create Presentation</h1>
-          <p className="text-muted-foreground mt-1">Configure your content and AI agent pipeline.</p>
+        <div className="p-8 pb-8 flex flex-col gap-2">
+          <span className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">Turn ideas into impactful presentations</span>
+          <h1 className="text-4xl font-bold tracking-tight">Create <span className="text-primary">Presentation</span></h1>
+          <p className="text-muted-foreground text-sm">Configure your content and AI agent pipeline.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 p-8 pt-0 overflow-auto">
             {/* Left Column: Content */}
             <div className="space-y-8">
-              <div className="space-y-3">
+              <div className="bg-card rounded-xl p-6 border space-y-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <Label className="text-base font-semibold">What is this presentation about?</Label>
+                  <Label className="text-base font-semibold text-foreground">What is this presentation about?</Label>
                   <span className="text-xs text-muted-foreground">{prompt.length} / 500</span>
                 </div>
                 <Textarea 
                   value={prompt}
                   onChange={e => setPrompt(e.target.value)}
                   placeholder="Describe your topic, key takeaways, and what you want to achieve..."
-                  className="h-40 text-base resize-none shadow-sm focus-visible:ring-primary"
+                  className="h-32 text-sm resize-none bg-background border-border/50 focus-visible:ring-primary shadow-inner"
                   maxLength={500}
                 />
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-2 pt-2">
+                  <span className="text-xs text-muted-foreground mr-2">Try an example:</span>
                   {EXAMPLES.map(ex => (
                     <div 
                       key={ex} 
                       onClick={() => setPrompt(ex)}
-                      className="text-xs px-3 py-1.5 rounded-full bg-muted cursor-pointer hover:bg-muted/80 border text-muted-foreground transition-colors"
+                      className="text-xs px-3 py-1.5 rounded-full bg-secondary cursor-pointer hover:bg-secondary/80 border text-secondary-foreground transition-colors"
                     >
                       {ex}
                     </div>
@@ -95,15 +97,20 @@ export function NewDeck() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>Target Audience</Label>
-                  <Input placeholder="e.g. Executives, Students" value={audience} onChange={e => setAudience(e.target.value)} />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-card rounded-xl p-4 border shadow-sm space-y-2">
+                  <Label className="text-sm font-medium text-foreground">Target Audience</Label>
+                  <Input 
+                    placeholder="e.g. Executives, Students" 
+                    value={audience} 
+                    onChange={e => setAudience(e.target.value)}
+                    className="bg-background text-sm h-9" 
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label>Language</Label>
+                <div className="bg-card rounded-xl p-4 border shadow-sm space-y-2">
+                  <Label className="text-sm font-medium text-foreground">Language</Label>
                   <Select value={language} onValueChange={setLanguage}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="bg-background text-sm h-9"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="en">English</SelectItem>
                       <SelectItem value="ur" dir="rtl">اردو (Urdu)</SelectItem>
@@ -114,18 +121,18 @@ export function NewDeck() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-card rounded-xl p-4 border shadow-sm space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label>Slide Count</Label>
-                    <span className="text-sm font-medium text-primary">{slideCount[0]} slides</span>
+                    <Label className="text-sm font-medium text-foreground">Slide Count</Label>
+                    <span className="text-xs font-medium text-muted-foreground">{slideCount[0]} slides</span>
                   </div>
-                  <Slider value={slideCount} onValueChange={setSlideCount} min={6} max={20} step={1} />
+                  <Slider value={slideCount} onValueChange={setSlideCount} min={6} max={20} step={1} className="py-2" />
                 </div>
-                <div className="space-y-2">
-                  <Label>Tone & Voice</Label>
+                <div className="bg-card rounded-xl p-4 border shadow-sm space-y-2">
+                  <Label className="text-sm font-medium text-foreground">Tone & Voice</Label>
                   <Select value={tone} onValueChange={setTone}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="bg-background text-sm h-9"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="professional">Professional & Direct</SelectItem>
                       <SelectItem value="friendly">Friendly & Accessible</SelectItem>
@@ -138,9 +145,9 @@ export function NewDeck() {
             </div>
 
             {/* Right Column: Agent Pipeline */}
-            <div className="bg-muted/30 rounded-xl border p-6 flex flex-col gap-6">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-lg">Agent Pipeline</h3>
+            <div className="bg-card rounded-xl border p-6 flex flex-col gap-6 shadow-sm relative overflow-hidden">
+              <div className="flex items-center justify-between z-10 relative">
+                <h3 className="font-semibold text-lg text-foreground">Agent Pipeline</h3>
                 <Select defaultValue="default">
                   <SelectTrigger className="w-[120px] h-8 text-xs bg-background">
                     <SelectValue placeholder="Presets" />
@@ -153,31 +160,31 @@ export function NewDeck() {
                 </Select>
               </div>
 
-              <div className="flex flex-col gap-4 relative before:absolute before:inset-y-4 before:left-4 before:w-0.5 before:bg-border">
+              <div className="flex flex-col gap-4 relative z-10 before:absolute before:inset-y-4 before:left-4 before:w-px before:bg-border">
                 
                 {/* Orchestrator */}
-                <div className="flex gap-4 relative z-10 items-center">
-                  <div className="w-8 h-8 rounded-full bg-background border shadow-sm flex items-center justify-center shrink-0 text-muted-foreground">
+                <div className="flex gap-4 relative items-center">
+                  <div className="w-8 h-8 rounded-full bg-background border flex items-center justify-center shrink-0 text-muted-foreground z-10">
                     <Code className="w-4 h-4" />
                   </div>
                   <div className="text-sm font-medium text-muted-foreground">Orchestrator (Code)</div>
                 </div>
 
                 {/* Writer */}
-                <div className="flex gap-4 relative z-10">
-                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground shadow-sm flex items-center justify-center shrink-0 mt-2">
+                <div className="flex gap-4 relative">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 mt-2 z-10 shadow-[0_0_15px_rgba(47,107,255,0.4)]">
                     <Bot className="w-4 h-4" />
                   </div>
-                  <div className="flex-1 bg-background border rounded-lg p-3 shadow-sm space-y-3">
+                  <div className="flex-1 bg-background border rounded-lg p-3 space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="font-medium text-sm">Writer Agent</div>
-                      <Switch checked disabled />
+                      <div className="font-medium text-sm text-foreground">Writer Agent</div>
+                      <Switch checked disabled className="scale-75" />
                     </div>
                     <Select defaultValue="gpt-4o">
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="gpt-4o">
-                          GPT-4o <Badge variant="secondary" className="ml-2 text-[10px] bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">Structured</Badge>
+                          GPT-4o <Badge variant="secondary" className="ml-2 text-[10px] bg-blue-500/10 text-blue-600">Structured</Badge>
                         </SelectItem>
                         <SelectItem value="claude-3-5-sonnet">Claude 3.5 Sonnet</SelectItem>
                       </SelectContent>
@@ -186,17 +193,17 @@ export function NewDeck() {
                 </div>
 
                 {/* Designer */}
-                <div className="flex gap-4 relative z-10">
-                  <div className={`w-8 h-8 rounded-full shadow-sm flex items-center justify-center shrink-0 mt-2 transition-colors ${designerOn ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground border'}`}>
+                <div className="flex gap-4 relative">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-2 z-10 transition-colors ${designerOn ? 'bg-primary text-primary-foreground shadow-[0_0_15px_rgba(47,107,255,0.4)]' : 'bg-secondary text-muted-foreground border'}`}>
                     <Palette className="w-4 h-4" />
                   </div>
-                  <div className={`flex-1 bg-background border rounded-lg p-3 shadow-sm space-y-3 transition-opacity ${!designerOn && 'opacity-50'}`}>
+                  <div className={`flex-1 bg-background border rounded-lg p-3 space-y-3 transition-opacity ${!designerOn && 'opacity-50'}`}>
                     <div className="flex items-center justify-between">
-                      <div className="font-medium text-sm">Designer Agent</div>
-                      <Switch checked={designerOn} onCheckedChange={setDesignerOn} />
+                      <div className="font-medium text-sm text-foreground">Designer Agent</div>
+                      <Switch checked={designerOn} onCheckedChange={setDesignerOn} className="scale-75" />
                     </div>
                     {designerOn && (
-                      <>
+                      <div className="space-y-2">
                         <Select defaultValue="claude-3-5-sonnet">
                           <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                           <SelectContent>
@@ -212,78 +219,79 @@ export function NewDeck() {
                             <SelectItem value="reference">Match reference style</SelectItem>
                           </SelectContent>
                         </Select>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>
 
                 {/* Visuals */}
-                <div className="flex gap-4 relative z-10">
-                  <div className={`w-8 h-8 rounded-full shadow-sm flex items-center justify-center shrink-0 mt-2 transition-colors ${visualsOn ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground border'}`}>
+                <div className="flex gap-4 relative">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-2 z-10 transition-colors ${visualsOn ? 'bg-primary text-primary-foreground shadow-[0_0_15px_rgba(47,107,255,0.4)]' : 'bg-secondary text-muted-foreground border'}`}>
                     <ImageIcon className="w-4 h-4" />
                   </div>
-                  <div className={`flex-1 bg-background border rounded-lg p-3 shadow-sm space-y-3 transition-opacity ${!visualsOn && 'opacity-50'}`}>
+                  <div className={`flex-1 bg-background border rounded-lg p-3 space-y-3 transition-opacity ${!visualsOn && 'opacity-50'}`}>
                     <div className="flex items-center justify-between">
-                      <div className="font-medium text-sm">Visuals Agent</div>
-                      <Switch checked={visualsOn} onCheckedChange={setVisualsOn} />
+                      <div className="font-medium text-sm text-foreground">Visuals Agent</div>
+                      <Switch checked={visualsOn} onCheckedChange={setVisualsOn} className="scale-75" />
                     </div>
                     {visualsOn && (
-                      <>
+                      <div className="space-y-2">
                         <Select defaultValue="dall-e-3">
                           <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="dall-e-3">
-                              DALL-E 3 <Badge variant="secondary" className="ml-2 text-[10px] bg-purple-500/10 text-purple-600 hover:bg-purple-500/20">Image</Badge>
+                              DALL-E 3 <Badge variant="secondary" className="ml-2 text-[10px] bg-purple-500/10 text-purple-600">Image</Badge>
                             </SelectItem>
                           </SelectContent>
                         </Select>
                         <div className="flex items-center gap-4 text-xs pt-1">
-                          <label className="flex items-center gap-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
                             <Switch checked={imagesOn} onCheckedChange={setImagesOn} className="scale-75" /> Images
                           </label>
-                          <label className="flex items-center gap-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
                             <Switch checked={diagramsOn} onCheckedChange={setDiagramsOn} className="scale-75" /> Diagrams
                           </label>
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>
 
                 {/* Critic */}
-                <div className="flex gap-4 relative z-10">
-                  <div className={`w-8 h-8 rounded-full shadow-sm flex items-center justify-center shrink-0 mt-2 transition-colors ${criticOn ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground border'}`}>
+                <div className="flex gap-4 relative">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-2 z-10 transition-colors ${criticOn ? 'bg-primary text-primary-foreground shadow-[0_0_15px_rgba(47,107,255,0.4)]' : 'bg-secondary text-muted-foreground border'}`}>
                     <Search className="w-4 h-4" />
                   </div>
-                  <div className={`flex-1 bg-background border rounded-lg p-3 shadow-sm space-y-3 transition-opacity ${!criticOn && 'opacity-50'}`}>
+                  <div className={`flex-1 bg-background border rounded-lg p-3 space-y-3 transition-opacity ${!criticOn && 'opacity-50'}`}>
                     <div className="flex items-center justify-between">
-                      <div className="font-medium text-sm">Critic Agent</div>
-                      <Switch checked={criticOn} onCheckedChange={setCriticOn} />
+                      <div className="font-medium text-sm text-foreground">Critic Agent</div>
+                      <Switch checked={criticOn} onCheckedChange={setCriticOn} className="scale-75" />
                     </div>
                     {criticOn && (
-                      <>
+                      <div className="space-y-2">
                         <Select defaultValue="gpt-4o">
                           <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="gpt-4o">
-                              GPT-4o <Badge variant="secondary" className="ml-2 text-[10px] bg-green-500/10 text-green-600 hover:bg-green-500/20">Vision</Badge>
+                              GPT-4o <Badge variant="secondary" className="ml-2 text-[10px] bg-green-500/10 text-green-600">Vision</Badge>
                             </SelectItem>
                           </SelectContent>
                         </Select>
-                        <div className="space-y-3 pt-2">
+                        <div className="space-y-2 pt-1 px-1">
                           <div className="flex justify-between items-center text-xs text-muted-foreground">
-                            <span>Rounds: {criticRounds[0]}</span>
+                            <span>Critic Rounds</span>
+                            <span className="font-medium">{criticRounds[0]}</span>
                           </div>
-                          <Slider value={criticRounds} onValueChange={setCriticRounds} min={1} max={3} step={1} />
+                          <Slider value={criticRounds} onValueChange={setCriticRounds} min={1} max={3} step={1} className="py-2" />
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>
 
                 {/* Export */}
-                <div className="flex gap-4 relative z-10 items-center">
-                  <div className="w-8 h-8 rounded-full bg-background border shadow-sm flex items-center justify-center shrink-0 text-muted-foreground">
+                <div className="flex gap-4 relative items-center">
+                  <div className="w-8 h-8 rounded-full bg-background border flex items-center justify-center shrink-0 text-muted-foreground z-10">
                     <Code className="w-4 h-4" />
                   </div>
                   <div className="text-sm font-medium text-muted-foreground">Export (Code)</div>
@@ -293,10 +301,12 @@ export function NewDeck() {
           </div>
 
           {/* Sticky Footer */}
-          <div className="sticky bottom-0 bg-background/80 backdrop-blur-md border-t p-6 flex justify-end gap-4 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] z-50">
-            <Button type="button" variant="ghost" onClick={() => navigate('/')}>Cancel</Button>
-            <Button type="submit" size="lg" className="px-8 shadow-md" disabled={!prompt.trim()}>
-              <Wand2 className="w-4 h-4 mr-2" />
+          <div className="sticky bottom-0 bg-background/80 backdrop-blur-md border-t p-6 flex justify-between items-center z-50">
+            <Button type="button" variant="ghost" onClick={() => navigate('/library')} className="text-muted-foreground hover:text-foreground">
+              Cancel
+            </Button>
+            <Button type="submit" size="lg" className="px-8 bg-gradient-to-r from-[#3B7BFF] to-[#2459E6] hover:from-[#1F55E0] hover:to-[#1F55E0] shadow-[0_4px_14px_0_rgba(47,107,255,0.39)] hover:shadow-[0_6px_20px_rgba(47,107,255,0.23)] border-none text-white font-medium transition-all" disabled={!prompt.trim()}>
+              <Sparkles className="w-4 h-4 mr-2" />
               {prompt.trim() ? "Generate Presentation" : "Enter a topic to begin"}
             </Button>
           </div>

@@ -92,7 +92,9 @@ apiRouter.get('/jobs/:id/events', async (req, res) => {
 // --- SETTINGS & AGENTS ---
 apiRouter.get('/settings', async (req, res) => {
   const settings = await prisma.setting.findMany();
-  const result: any = {};
+  const result: any = {
+    openRouterKeyStatus: process.env.OPENROUTER_API_KEY ? 'valid' : 'missing'
+  };
   for (const s of settings) {
     result[s.key] = parseJson(s.value);
   }
