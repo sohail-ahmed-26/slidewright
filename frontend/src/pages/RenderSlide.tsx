@@ -8,11 +8,10 @@ export default function RenderSlide() {
   const [searchParams] = useSearchParams();
   const slideIndex = parseInt(searchParams.get('slide') || '0', 10);
   const [slideData, setSlideData] = useState<any>(null);
+  const [theme, setTheme] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Try to fetch from /outputs/decks/:deckId.json
-    // Fall back to fixtures if we can't fetch it
     fetch(`/outputs/decks/${deckId}.json`)
       .then(res => {
         if (!res.ok) throw new Error("Deck not found locally");
@@ -21,15 +20,16 @@ export default function RenderSlide() {
       .then(data => {
         if (data.slides && data.slides[slideIndex]) {
           setSlideData(data.slides[slideIndex]);
+          setTheme(data.theme);
         } else {
           setError("Slide not found in deck");
         }
       })
       .catch(err => {
-        // Fallback to fixture
         const deck = FIXTURES.decks.find(d => d.id === deckId) || FIXTURES.decks[0];
         if (deck && deck.slides && deck.slides[slideIndex]) {
           setSlideData(deck.slides[slideIndex]);
+          setTheme((deck as any).theme);
         } else {
           setError(err.message + " (and no fixture fallback found)");
         }
@@ -44,8 +44,7 @@ export default function RenderSlide() {
     return <div className="p-8">Loading slide...</div>;
   }
 
-  // Pure 1:1 render with no layout padding around it
   return (
-    <SlideRenderer slide={slideData} exportMode />
+    <SlideRenderer slide={slideData} theme={theme} exportMode />
   );
 }

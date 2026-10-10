@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 import * as Icons from 'lucide-react';
+import { AnimCountUp } from './SlideAnimations';
 
 export function TitleWithAccent({ title, accentText, className }: { title: string, accentText?: string, className?: string }) {
   return (
@@ -37,7 +38,7 @@ export function IconBadge({ icon, className }: { icon: string, className?: strin
 
 export function ChipTag({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
-    <span className={cn("inline-flex items-center px-3 py-1 rounded-full bg-accent text-accent-foreground text-[16px] font-medium border", className)} data-pptx="rect">
+    <span className={cn("inline-flex items-center px-4 py-2 rounded-full bg-accent text-accent-foreground text-[16px] font-medium border", className)} data-pptx="rect">
       {children}
     </span>
   );
@@ -46,7 +47,7 @@ export function ChipTag({ children, className }: { children: React.ReactNode, cl
 export function BigNumber({ number, label, className }: { number: string, label: string, className?: string }) {
   return (
     <div className={cn("flex flex-col items-center justify-center", className)} data-pptx="rect">
-      <div className="text-[120px] font-bold text-primary" data-pptx="text">{number}</div>
+      <AnimCountUp value={number} className="text-[120px] font-bold text-primary" />
       <div className="text-[21px] font-medium text-muted-foreground mt-2" data-pptx="text">{label}</div>
     </div>
   );

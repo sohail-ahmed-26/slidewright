@@ -4,6 +4,7 @@ import { AppLayout } from '../components/layout/AppLayout';
 import DevKit from '../pages/DevKit';
 import DevSlides from '../pages/DevSlides';
 import RenderSlide from '../pages/RenderSlide';
+import { DeckPresent } from '../pages/DeckPresent';
 
 // Placeholder Pages
 const Home = () => <div className="p-8"><h1 className="text-2xl font-bold">Home</h1><p className="text-muted-foreground mt-2">Welcome to Slidewright. Start by creating a new presentation or checking the library.</p></div>;
@@ -11,7 +12,6 @@ const NewDeck = () => <div className="p-8"><h1 className="text-2xl font-bold">Ne
 const RunJob = () => <div className="p-8"><h1 className="text-2xl font-bold">Running Job...</h1></div>;
 const Library = () => <div className="p-8"><h1 className="text-2xl font-bold">Library</h1></div>;
 const DeckEditor = () => <div className="p-8"><h1 className="text-2xl font-bold">Deck Editor</h1></div>;
-const DeckPresent = () => <div className="p-8"><h1 className="text-2xl font-bold">Presentation View</h1></div>;
 const Agents = () => <div className="p-8"><h1 className="text-2xl font-bold">Agents</h1></div>;
 const AgentConfig = () => <div className="p-8"><h1 className="text-2xl font-bold">Agent Config</h1></div>;
 const Settings = () => <div className="p-8"><h1 className="text-2xl font-bold">Settings</h1></div>;
@@ -26,13 +26,16 @@ export const router = createBrowserRouter([
       { path: 'runs/:jobId', element: <RunJob /> },
       { path: 'library', element: <Library /> },
       { path: 'decks/:id', element: <DeckEditor /> },
-      { path: 'decks/:id/present', element: <DeckPresent /> },
       { path: 'agents', element: <Agents /> },
       { path: 'agents/:name', element: <AgentConfig /> },
       { path: 'settings', element: <Settings /> },
       { path: 'dev/kit', element: <DevKit /> },
       { path: 'dev/slides', element: <DevSlides /> },
     ]
+  },
+  {
+    path: '/decks/:id/present',
+    element: <DeckPresent />
   },
   {
     // Render standalone slide (without app layout)

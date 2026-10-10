@@ -3,9 +3,13 @@ import { cn } from '../../lib/utils';
 
 interface SlideCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
   exportMode?: boolean;
+  theme?: {
+    primary?: string;
+    fontFamily?: string;
+  };
 }
 
-export function SlideCanvas({ exportMode, className, children, ...props }: SlideCanvasProps) {
+export function SlideCanvas({ exportMode, theme, className, children, ...props }: SlideCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -18,7 +22,6 @@ export function SlideCanvas({ exportMode, className, children, ...props }: Slide
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        // Canvas is 1280x720. Calculate scale to fit inside container while preserving aspect ratio.
         const scaleX = width / 1280;
         const scaleY = height / 720;
         setScale(Math.min(scaleX, scaleY));
@@ -32,6 +35,21 @@ export function SlideCanvas({ exportMode, className, children, ...props }: Slide
     return () => observer.disconnect();
   }, [exportMode]);
 
+  const customStyle: React.CSSProperties = {
+    width: 1280,
+    height: 720,
+    transform: `scale(${scale})`,
+    transformOrigin: 'center center',
+  };
+
+  if (theme?.primary) {
+    (customStyle as any)['--primary'] = theme.primary;
+    (customStyle as any)['--ring'] = theme.primary;
+  }
+  if (theme?.fontFamily) {
+    customStyle.fontFamily = theme.fontFamily;
+  }
+
   return (
     <div 
       ref={containerRef} 
@@ -44,13 +62,7 @@ export function SlideCanvas({ exportMode, className, children, ...props }: Slide
           exportMode ? "" : "shadow-xl border border-gray-200",
           className
         )}
-        style={{
-          width: 1280,
-          height: 720,
-          transform: `scale(${scale})`,
-          transformOrigin: 'center center',
-          // 0.6 inch margins ~ 58px. We can use Tailwind p-[58px] inside layouts
-        }}
+        style={customStyle}
         data-pptx="rect"
         {...props}
       >
