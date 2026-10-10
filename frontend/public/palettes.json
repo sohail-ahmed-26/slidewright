@@ -1,0 +1,194 @@
+[
+  {
+    "id": 1,
+    "topic": "Topic 1",
+    "design": {
+      "hue": 129,
+      "accentHue": null,
+      "fontHeading": "Arial, sans-serif",
+      "fontBody": "Arial, sans-serif",
+      "radius": "16",
+      "shadow": "soft",
+      "cardStyle": "tinted",
+      "iconShape": "circle",
+      "motif": "dots",
+      "imageStyle": "minimalist flat illustration",
+      "moodName": "Mock Clean Design",
+      "rationale": "Testing mock generator.",
+      "theme": {
+        "primary": "129 80% 30%",
+        "primaryForeground": "0 0% 100%",
+        "muted": "129 20% 90%",
+        "mutedForeground": "129 30% 35%"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "topic": "Topic 2",
+    "design": {
+      "hue": 38,
+      "accentHue": null,
+      "fontHeading": "Arial, sans-serif",
+      "fontBody": "Arial, sans-serif",
+      "radius": "16",
+      "shadow": "soft",
+      "cardStyle": "tinted",
+      "iconShape": "circle",
+      "motif": "dots",
+      "imageStyle": "minimalist flat illustration",
+      "moodName": "Mock Clean Design",
+      "rationale": "Testing mock generator.",
+      "theme": {
+        "primary": "38 80% 34%",
+        "primaryForeground": "0 0% 100%",
+        "muted": "38 20% 90%",
+        "mutedForeground": "38 30% 36%"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "topic": "Topic 3",
+    "design": {
+      "hue": 33,
+      "accentHue": null,
+      "fontHeading": "Arial, sans-serif",
+      "fontBody": "Arial, sans-serif",
+      "radius": "16",
+      "shadow": "soft",
+      "cardStyle": "tinted",
+      "iconShape": "circle",
+      "motif": "dots",
+      "imageStyle": "minimalist flat illustration",
+      "moodName": "Mock Clean Design",
+      "rationale": "Testing mock generator.",
+      "theme": {
+        "primary": "33 80% 37%",
+        "primaryForeground": "0 0% 100%",
+        "muted": "33 20% 90%",
+        "mutedForeground": "33 30% 37%"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "topic": "Topic 4",
+    "design": {
+      "hue": 93,
+      "accentHue": null,
+      "fontHeading": "Arial, sans-serif",
+      "fontBody": "Arial, sans-serif",
+      "radius": "16",
+      "shadow": "soft",
+      "cardStyle": "tinted",
+      "iconShape": "circle",
+      "motif": "dots",
+      "imageStyle": "minimalist flat illustration",
+      "moodName": "Mock Clean Design",
+      "rationale": "Testing mock generator.",
+      "theme": {
+        "primary": "93 80% 29%",
+        "primaryForeground": "0 0% 100%",
+        "muted": "93 20% 90%",
+        "mutedForeground": "93 30% 34%"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "topic": "Topic 5",
+    "design": {
+      "hue": 339,
+      "accentHue": null,
+      "fontHeading": "Arial, sans-serif",
+      "fontBody": "Arial, sans-serif",
+      "radius": "16",
+      "shadow": "soft",
+      "cardStyle": "tinted",
+      "iconShape": "circle",
+      "motif": "dots",
+      "imageStyle": "minimalist flat illustration",
+      "moodName": "Mock Clean Design",
+      "rationale": "Testing mock generator.",
+      "theme": {
+        "primary": "339 80% 50%",
+        "primaryForeground": "0 0% 100%",
+        "muted": "339 20% 90%",
+        "mutedForeground": "339 30% 40%"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "topic": "Topic 6",
+    "design": {
+      "hue": 275,
+      "accentHue": null,
+      "fontHeading": "Arial, sans-serif",
+      "fontBody": "Arial, sans-serif",
+      "radius": "16",
+      "shadow": "soft",
+      "cardStyle": "tinted",
+      "iconShape": "circle",
+      "motif": "dots",
+      "imageStyle": "minimalist flat illustration",
+      "moodName": "Mock Clean Design",
+      "rationale": "Testing mock generator.",
+      "theme": {
+        "primary": "275 80% 50%",
+        "primaryForeground": "0 0% 100%",
+        "muted": "275 20% 90%",
+        "mutedForeground": "275 30% 40%"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "topic": "Topic 7",
+    "design": {
+      "hue": 267,
+      "accentHue": null,
+      "fontHeading": "Arial, sans-serif",
+      "fontBody": "Arial, sans-serif",
+      "radius": "16",
+      "shadow": "soft",
+      "cardStyle": "tinted",
+      "iconShape": "circle",
+      "motif": "dots",
+      "imageStyle": "minimalist flat illustration",
+      "moodName": "Mock Clean Design",
+      "rationale": "Testing mock generator.",
+      "theme": {
+        "primary": "267 80% 50%",
+        "primaryForeground": "0 0% 100%",
+        "muted": "267 20% 90%",
+        "mutedForeground": "267 30% 40%"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "topic": "Topic 8",
+    "design": {
+      "hue": 241,
+      "accentHue": null,
+      "fontHeading": "Arial, sans-serif",
+      "fontBody": "Arial, sans-serif",
+      "radius": "16",
+      "shadow": "soft",
+      "cardStyle": "tinted",
+      "iconShape": "circle",
+      "motif": "dots",
+      "imageStyle": "minimalist flat illustration",
+      "moodName": "Mock Clean Design",
+      "rationale": "Testing mock generator.",
+      "theme": {
+        "primary": "241 80% 50%",
+        "primaryForeground": "0 0% 100%",
+        "muted": "241 20% 90%",
+        "mutedForeground": "241 30% 40%"
+      }
+    }
+  }
+]
