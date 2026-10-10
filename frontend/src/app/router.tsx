@@ -2,6 +2,8 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import DevKit from '../pages/DevKit';
+import DevSlides from '../pages/DevSlides';
+import RenderSlide from '../pages/RenderSlide';
 
 // Placeholder Pages
 const Home = () => <div className="p-8"><h1 className="text-2xl font-bold">Home</h1><p className="text-muted-foreground mt-2">Welcome to Slidewright. Start by creating a new presentation or checking the library.</p></div>;
@@ -29,6 +31,12 @@ export const router = createBrowserRouter([
       { path: 'agents/:name', element: <AgentConfig /> },
       { path: 'settings', element: <Settings /> },
       { path: 'dev/kit', element: <DevKit /> },
+      { path: 'dev/slides', element: <DevSlides /> },
     ]
+  },
+  {
+    // Render standalone slide (without app layout)
+    path: '/render/:deckId',
+    element: <RenderSlide />
   }
 ]);
