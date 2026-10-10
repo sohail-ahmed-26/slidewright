@@ -16,6 +16,7 @@
     "check:openrouter": "npx tsx agents/scripts/check-openrouter.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@types/node": "^26.6.5",
     "concurrently": "^10.0.6",
     "playwright": "^1.64.0",
