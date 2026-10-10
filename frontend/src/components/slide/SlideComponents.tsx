@@ -5,7 +5,7 @@ import { AnimCountUp } from './SlideAnimations';
 
 export function TitleWithAccent({ title, accentText, className }: { title: string, accentText?: string, className?: string }) {
   return (
-    <h1 className={cn("text-[43px] font-semibold leading-tight", className)} data-pptx="text">
+    <h1 className={cn("text-[48px] font-bold tracking-tight leading-tight", className)} data-pptx="text">
       {title} {accentText && <span className="text-primary">{accentText}</span>}
     </h1>
   );
@@ -13,7 +13,7 @@ export function TitleWithAccent({ title, accentText, className }: { title: strin
 
 export function TintCard({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
-    <div className={cn("bg-muted rounded-[12px] p-6 border border-border flex flex-col", className)} data-pptx="rect">
+    <div className={cn("bg-muted/50 rounded-[16px] p-8 border border-border/50 shadow-sm flex flex-col", className)} data-pptx="rect">
       {children}
     </div>
   );
@@ -21,7 +21,7 @@ export function TintCard({ children, className }: { children: React.ReactNode, c
 
 export function DarkCard({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
-    <div className={cn("bg-gray-900 text-white rounded-[12px] p-6 flex flex-col", className)} data-pptx="rect">
+    <div className={cn("bg-gray-900 text-white rounded-[16px] p-8 flex flex-col shadow-lg", className)} data-pptx="rect">
       {children}
     </div>
   );
@@ -30,7 +30,7 @@ export function DarkCard({ children, className }: { children: React.ReactNode, c
 export function IconBadge({ icon, className }: { icon: string, className?: string }) {
   const IconComp = (Icons as any)[icon] || Icons.CheckCircle;
   return (
-    <div className={cn("inline-flex items-center justify-center bg-primary/10 text-primary p-3 rounded-[12px]", className)} data-pptx="rect">
+    <div className={cn("inline-flex items-center justify-center bg-primary/10 text-primary p-4 rounded-full", className)} data-pptx="rect">
       <IconComp className="w-8 h-8" data-pptx="icon" />
     </div>
   );
@@ -72,7 +72,7 @@ export function FooterBar({ orgName, pageNumber, className }: { orgName: string,
 
 export function ImageFrame({ src, alt, className }: { src: string, alt: string, className?: string }) {
   return (
-    <div className={cn("rounded-[12px] overflow-hidden border border-border bg-muted flex items-center justify-center", className)} data-pptx="rect">
+    <div className={cn("rounded-[16px] overflow-hidden border border-border bg-muted flex items-center justify-center shadow-sm", className)} data-pptx="rect">
       {src ? <img src={src} alt={alt} className="w-full h-full object-cover" data-pptx="image" /> : <Icons.Image className="w-12 h-12 text-muted-foreground" data-pptx="icon" />}
     </div>
   );
