@@ -13,13 +13,19 @@
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "typecheck": "echo \"TODO\"",
-    "test": "echo \"TODO\""
+    "test": "echo \"TODO\"",
+    "models:list": "npx tsx agents/scripts/models-list.ts",
+    "check:openrouter": "npx tsx agents/scripts/check-openrouter.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
     "concurrently": "^10.0.6",
+    "playwright": "^1.64.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.7"
   }
 }
