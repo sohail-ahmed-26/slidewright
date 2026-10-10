@@ -1,14 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useUIStore } from '../../lib/store';
+import { useDeckStore } from '../../store/useDeckStore';
 import { Plus, Library, Bot, Settings, PanelLeftClose, PanelLeft, Clock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
-import { FIXTURES } from '@slidewright/shared/src/fixtures';
 
 export function Sidebar() {
   const { sidebarOpen, toggleSidebar } = useUIStore();
-  const recentDecks = FIXTURES.decks.slice(0, 5);
+  const decks = useDeckStore(s => s.decks);
+  const recentDecks = decks.slice(0, 5);
 
   return (
     <aside className={cn(

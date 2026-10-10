@@ -3,6 +3,7 @@ import { TitleWithAccent, TintCard, DarkCard, IconBadge, BigNumber, FooterBar, I
 import * as Icons from 'lucide-react';
 import { AnimFadeUp, AnimStaggerContainer, AnimStaggerItem } from './SlideAnimations';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList, Cell } from 'recharts';
+import { cn } from '../../lib/utils';
 
 export const SlideLayouts: Record<string, React.FC<any>> = {
   cover: ({ title, subtitle, orgName }) => (

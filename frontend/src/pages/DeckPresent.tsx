@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { FIXTURES } from '@slidewright/shared/src/fixtures';
+import { useDeckStore } from '../store/useDeckStore';
 import { SlideRenderer } from '../components/slide/SlideRenderer';
 import { Button } from '../components/ui/button';
 import { Maximize, Minimize, ChevronLeft, ChevronRight, MousePointer2, FileText, X } from 'lucide-react';
@@ -10,20 +9,14 @@ import { cn } from '../lib/utils';
 export function DeckPresent() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const deck = useDeckStore(s => s.decks.find(d => d.id === id));
+  
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [laserOn, setLaserOn] = useState(false);
   const [notesOn, setNotesOn] = useState(false);
   const [laserPos, setLaserPos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // In real app, fetch from mock API. Using FIXTURES for now.
-  const { data: deck, isLoading } = useQuery({
-    queryKey: ['deck', id],
-    queryFn: async () => {
-      return FIXTURES.decks.find(d => d.id === id);
-    }
-  });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -61,7 +54,6 @@ export function DeckPresent() {
     }
   };
 
-  if (isLoading) return <div className="p-8 text-center">Loading...</div>;
   if (!deck || !deck.slides) return <div className="p-8 text-center text-red-500">Deck not found or no slides.</div>;
 
   const slide = deck.slides[currentSlideIndex];

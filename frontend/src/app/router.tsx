@@ -5,16 +5,15 @@ import DevKit from '../pages/DevKit';
 import DevSlides from '../pages/DevSlides';
 import RenderSlide from '../pages/RenderSlide';
 import { DeckPresent } from '../pages/DeckPresent';
+import { Home } from '../pages/Home';
+import { Library } from '../pages/Library';
+import { DeckEditor } from '../pages/DeckEditor';
+import { NewDeck } from '../pages/NewDeck';
+import { RunJob } from '../pages/RunJob';
 
-// Placeholder Pages
-const Home = () => <div className="p-8"><h1 className="text-2xl font-bold">Home</h1><p className="text-muted-foreground mt-2">Welcome to Slidewright. Start by creating a new presentation or checking the library.</p></div>;
-const NewDeck = () => <div className="p-8"><h1 className="text-2xl font-bold">New Presentation</h1></div>;
-const RunJob = () => <div className="p-8"><h1 className="text-2xl font-bold">Running Job...</h1></div>;
-const Library = () => <div className="p-8"><h1 className="text-2xl font-bold">Library</h1></div>;
-const DeckEditor = () => <div className="p-8"><h1 className="text-2xl font-bold">Deck Editor</h1></div>;
-const Agents = () => <div className="p-8"><h1 className="text-2xl font-bold">Agents</h1></div>;
-const AgentConfig = () => <div className="p-8"><h1 className="text-2xl font-bold">Agent Config</h1></div>;
-const Settings = () => <div className="p-8"><h1 className="text-2xl font-bold">Settings</h1></div>;
+import { Agents } from '../pages/Agents';
+import { AgentConfig } from '../pages/AgentConfig';
+import { Settings } from '../pages/Settings';
 
 export const router = createBrowserRouter([
   {

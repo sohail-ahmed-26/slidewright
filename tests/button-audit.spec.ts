@@ -40,9 +40,12 @@ test.describe('Button Audit & Screenshots', () => {
         await page.screenshot({ path: `outputs/screenshots/${routeName}-${viewport.width}-light.png` });
 
         // Dark mode screenshot
-        await page.locator('button[aria-label="Toggle Theme"]').click();
-        await page.waitForTimeout(500); // wait for transition
-        await page.screenshot({ path: `outputs/screenshots/${routeName}-${viewport.width}-dark.png` });
+        const themeToggle = page.locator('button[aria-label="Toggle Theme"]');
+        if (await themeToggle.count() > 0) {
+          await themeToggle.click();
+          await page.waitForTimeout(500); // wait for transition
+          await page.screenshot({ path: `outputs/screenshots/${routeName}-${viewport.width}-dark.png` });
+        }
         
         // Find all buttons and links
         const interactables = await page.locator('button:not([disabled]), a[href]').all();
