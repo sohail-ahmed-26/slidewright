@@ -8,6 +8,7 @@ import { MoreVertical, Play, Edit2, Copy, Download, Trash2 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Deck, useDeckStore } from '../store/useDeckStore';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import { SlideThumb } from './slide/SlideThumb';
 
 export function formatRelative(dateString: string) {
   const diff = Date.now() - new Date(dateString).getTime();
@@ -23,9 +24,10 @@ export function DeckCard({ deck }: { deck: Deck }) {
   const deleteDeck = useDeckStore(s => s.deleteDeck);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
 
-  const statusColor = deck.status === 'ready' ? 'bg-green-500/10 text-green-500 hover:bg-green-500/20' : 
-                      deck.status === 'running' ? 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20' : 
-                      'bg-red-500/10 text-red-500 hover:bg-red-500/20';
+  // Use semantic classes for badges based on the new CSS variables
+  const statusColor = deck.status === 'ready' ? 'bg-success text-success-foreground' : 
+                      deck.status === 'running' ? 'bg-info text-info-foreground' : 
+                      'bg-warning text-warning-foreground';
 
   return (
     <>
@@ -33,11 +35,7 @@ export function DeckCard({ deck }: { deck: Deck }) {
         {/* Thumbnail container */}
         <div className="relative aspect-video bg-muted/30 border-b overflow-hidden">
           {deck.slides && deck.slides[0] ? (
-            <div className="w-full h-full pointer-events-none origin-top-left flex items-center justify-center p-2">
-               <div className="w-full h-full relative">
-                 <SlideRenderer slide={deck.slides[0]} theme={deck.theme} exportMode />
-               </div>
-            </div>
+            <SlideThumb deck={deck} slide={deck.slides[0]} className="w-full h-full rounded-none" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground/50">
               Empty

@@ -54,8 +54,8 @@ export function NewDeck() {
         <p className="text-muted-foreground mt-1">Configure your agents to generate a new slide deck.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
             <Label className="text-base">What is this presentation about?</Label>
             <span className="text-xs text-muted-foreground">{prompt.length} / 500</span>
@@ -141,8 +141,19 @@ export function NewDeck() {
                 <div className="flex items-center gap-3">
                   <Sparkles className="w-5 h-5 text-primary" />
                   <div>
-                    <div className="font-medium text-sm">Visuals & Designer Agent</div>
-                    <div className="text-xs text-muted-foreground">Layouts, colors, and images</div>
+                    <div className="font-medium text-sm">Designer Agent</div>
+                    <div className="text-xs text-muted-foreground">Layouts and colors</div>
+                  </div>
+                </div>
+                <Switch checked disabled />
+              </div>
+
+              <div className="flex items-center justify-between border p-3 rounded-lg bg-card">
+                <div className="flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  <div>
+                    <div className="font-medium text-sm">Visuals Agent</div>
+                    <div className="text-xs text-muted-foreground">Images and icons</div>
                   </div>
                 </div>
                 <Switch checked={visualsOn} onCheckedChange={setVisualsOn} />
@@ -161,20 +172,22 @@ export function NewDeck() {
                 </Select>
               </div>
 
-              <div className="flex items-center space-x-2 pt-4">
-                <Switch id="fail" checked={simulateFailure} onCheckedChange={setSimulateFailure} />
-                <Label htmlFor="fail" className="text-muted-foreground font-normal">Simulate pipeline failure (for testing)</Label>
-              </div>
             </div>
           </div>
         </div>
 
-        <div className="pt-8 border-t flex justify-end gap-4">
-          <Button type="button" variant="ghost" onClick={() => navigate('/')}>Cancel</Button>
-          <Button type="submit" size="lg" disabled={!prompt.trim()}>
-            <Wand2 className="w-4 h-4 mr-2" />
-            Generate Presentation
-          </Button>
+        <div className="pt-6 border-t flex justify-between items-center gap-4">
+          <div className="flex items-center space-x-2">
+            <Switch id="fail" checked={simulateFailure} onCheckedChange={setSimulateFailure} />
+            <Label htmlFor="fail" className="text-muted-foreground font-normal text-xs">Simulate pipeline failure</Label>
+          </div>
+          <div className="flex gap-4">
+            <Button type="button" variant="ghost" onClick={() => navigate('/')}>Cancel</Button>
+            <Button type="submit" size="lg" disabled={!prompt.trim()}>
+              <Wand2 className="w-4 h-4 mr-2" />
+              Generate Presentation
+            </Button>
+          </div>
         </div>
       </form>
     </div>

@@ -13,3 +13,6 @@
 
 **Faisla**: Implemented Mock Mode in `callLLM` and `generateImage` that defaults to returning fixtures.
 **Wajah**: Required by project rules to ensure the app functions without any network requests or API keys when `USE_MOCK_LLM=true`.
+
+**Faisla**: Use `pages/` and `components/` instead of a domain-driven `features/` structure in the frontend.
+**Wajah**: For a straightforward application size, flattening components and pages is simpler and adheres to standard Vite/React scaffolding patterns without over-engineering.

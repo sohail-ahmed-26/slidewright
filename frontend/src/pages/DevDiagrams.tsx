@@ -9,7 +9,7 @@ export default function DevDiagrams() {
     // We will just dynamically load eval-visuals-1 to 6
     const load = async () => {
       try {
-        const data = await fetch('/visuals.json').then(r => r.json());
+        const data = await fetch('http://localhost:4000/outputs/decks/visuals.json').then(r => r.json());
         setDecks(data);
       } catch (e) {
         console.error(e);

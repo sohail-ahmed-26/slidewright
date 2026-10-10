@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDeckStore } from '../store/useDeckStore';
 import { SlideRenderer } from '../components/slide/SlideRenderer';
+import { SlideThumb } from '../components/slide/SlideThumb';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
@@ -119,7 +120,7 @@ export function DeckEditor() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left Rail - Thumbnails */}
-        <aside className="w-48 bg-card border-r flex flex-col shrink-0">
+        <aside className="w-[200px] bg-card border-r flex flex-col shrink-0">
           <ScrollArea className="flex-1 p-3">
             <Reorder.Group 
               axis="y" 
@@ -146,11 +147,7 @@ export function DeckEditor() {
                     onClick={() => setActiveSlideIdx(i)}
                     className={`aspect-video relative rounded-md overflow-hidden border-2 transition-colors ${i === activeSlideIdx ? 'border-primary ring-2 ring-primary/20 shadow-sm' : 'border-transparent hover:border-border bg-muted/50'}`}
                   >
-                    <div className="w-full h-full pointer-events-none p-1">
-                       <div className="w-full h-full relative">
-                         <SlideRenderer slide={s} theme={deck.theme} exportMode />
-                       </div>
-                    </div>
+                    <SlideThumb deck={deck} slide={s} className="w-full h-full rounded-none" />
                   </div>
                   
                   {/* Floating slide actions */}
@@ -169,25 +166,25 @@ export function DeckEditor() {
         </aside>
 
         {/* Center - Canvas */}
-        <main className="flex-1 flex flex-col relative overflow-hidden bg-[#e5e5e5] dark:bg-black/90">
-          <div className="flex-1 p-8 flex items-center justify-center overflow-auto relative">
-             <div className="w-full max-w-[1280px] aspect-video bg-white shadow-xl flex items-center justify-center relative overflow-hidden">
+        <main className="flex-1 flex flex-col relative overflow-hidden bg-[#F6F9F9] dark:bg-[#0A1413]">
+          <div className="flex-1 p-[32px] flex items-center justify-center overflow-auto relative">
+             <div className="w-full h-full max-w-[1280px] max-h-[720px] aspect-video rounded-xl overflow-hidden shadow-2xl flex items-center justify-center relative">
                 <SlideRenderer slide={activeSlide} theme={deck.theme} />
              </div>
           </div>
           
-          {/* Canvas Controls */}
-          <div className="h-12 border-t bg-background/50 backdrop-blur-sm flex items-center justify-center gap-4 px-4 absolute bottom-0 w-full shrink-0">
-             <Button variant="ghost" size="icon" onClick={() => setActiveSlideIdx(i => Math.max(0, i-1))} disabled={activeSlideIdx === 0}><ChevronLeft className="w-4 h-4" /></Button>
+          {/* Floating Canvas Controls */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 h-12 bg-card/90 backdrop-blur-md border shadow-lg rounded-full flex items-center justify-center gap-4 px-6">
+             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setActiveSlideIdx(i => Math.max(0, i-1))} disabled={activeSlideIdx === 0}><ChevronLeft className="w-4 h-4" /></Button>
              <span className="text-sm font-medium w-16 text-center">Slide {activeSlideIdx + 1}</span>
-             <Button variant="ghost" size="icon" onClick={() => setActiveSlideIdx(i => Math.min(deck.slides.length - 1, i+1))} disabled={activeSlideIdx === deck.slides.length - 1}><ChevronRight className="w-4 h-4" /></Button>
+             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setActiveSlideIdx(i => Math.min(deck.slides.length - 1, i+1))} disabled={activeSlideIdx === deck.slides.length - 1}><ChevronRight className="w-4 h-4" /></Button>
              <div className="w-px h-4 bg-border mx-2" />
-             <Button variant="ghost" size="sm" className="text-xs text-muted-foreground"><ZoomIn className="w-3 h-3 mr-2" /> Fit to screen</Button>
+             <Button variant="ghost" size="sm" className="text-xs text-muted-foreground rounded-full h-8"><ZoomIn className="w-3 h-3 mr-2" /> Fit to screen</Button>
           </div>
         </main>
 
         {/* Right Panel - Inspector */}
-        <aside className="w-80 bg-card border-l flex flex-col shrink-0">
+        <aside className="w-[320px] bg-card border-l flex flex-col shrink-0">
           <Tabs defaultValue="slide" className="w-full flex flex-col h-full">
             <TabsList className="w-full grid grid-cols-4 rounded-none border-b bg-transparent h-12 p-0">
               <TabsTrigger value="slide" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Slide</TabsTrigger>

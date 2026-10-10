@@ -8,14 +8,14 @@ import { DiagramRenderer } from './diagrams';
 
 export const SlideLayouts: Record<string, React.FC<any>> = {
   cover: ({ title, subtitle, orgName }) => (
-    <div className="w-full h-full flex flex-col items-center justify-center p-[58px] text-center">
+    <div className="w-full h-full flex flex-col items-center justify-center p-[58px] text-center bg-primary text-primary-foreground" data-pptx="rect">
       <AnimFadeUp delay={0.1}>
-        <h1 className="text-[61px] font-bold text-gray-900" data-pptx="text">{title}</h1>
+        <h1 className="text-[61px] font-bold" data-pptx="text">{title}</h1>
       </AnimFadeUp>
       <AnimFadeUp delay={0.2}>
-        <p className="text-[21px] text-muted-foreground mt-6 max-w-3xl" data-pptx="text">{subtitle}</p>
+        <p className="text-[21px] opacity-80 mt-6 max-w-3xl" data-pptx="text">{subtitle}</p>
       </AnimFadeUp>
-      <FooterBar orgName={orgName} pageNumber={1} />
+      <FooterBar orgName={orgName} pageNumber={1} className="text-primary-foreground/50" />
     </div>
   ),
 

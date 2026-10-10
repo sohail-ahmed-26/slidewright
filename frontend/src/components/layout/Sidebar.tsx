@@ -17,7 +17,12 @@ export function Sidebar() {
       sidebarOpen ? "w-64" : "w-16"
     )}>
       <div className="h-14 flex items-center justify-between px-4 border-b">
-        {sidebarOpen && <span className="font-bold text-lg tracking-tight truncate">Slidewright</span>}
+        {sidebarOpen && (
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-primary rounded-sm shrink-0"/>
+            <span className="font-bold text-lg tracking-tight truncate">Slidewright</span>
+          </div>
+        )}
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="shrink-0" aria-label="Toggle Sidebar">
           {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
         </Button>
