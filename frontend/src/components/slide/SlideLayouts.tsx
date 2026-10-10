@@ -19,7 +19,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  two_cards: ({ title, cards, orgName, pageNumber }) => (
+  two_cards: ({ title, cards = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[32px]" /></AnimFadeUp>
       <AnimStaggerContainer className="flex-1 grid grid-cols-2 gap-[32px]">
@@ -36,7 +36,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  icon_rows: ({ title, rows, orgName, pageNumber }) => (
+  icon_rows: ({ title, rows = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[32px]" /></AnimFadeUp>
       <AnimStaggerContainer className="flex flex-col gap-[24px] flex-1">
@@ -57,7 +57,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  grid_2x2: ({ title, cards, orgName, pageNumber }) => (
+  grid_2x2: ({ title, cards = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[32px]" /></AnimFadeUp>
       <AnimStaggerContainer className="flex-1 grid grid-cols-2 grid-rows-2 gap-[32px]">
@@ -75,7 +75,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  icon_list_dark_panel: ({ title, darkPanel, list, orgName, pageNumber }) => (
+  icon_list_dark_panel: ({ title, darkPanel = { title: '', subtitle: '' }, list = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex p-[58px] gap-[32px]">
       <AnimFadeUp className="w-1/3">
         <DarkCard className="h-full justify-center items-center text-center">
@@ -110,7 +110,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  cards_3_bar: ({ title, cards, orgName, pageNumber }) => (
+  cards_3_bar: ({ title, cards = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[32px]" /></AnimFadeUp>
       <AnimStaggerContainer className="flex-1 grid grid-cols-3 gap-[32px]">
@@ -140,7 +140,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
   ),
 
   // New Layouts
-  chip_grid_callout: ({ title, callout, chips, orgName, pageNumber }) => (
+  chip_grid_callout: ({ title, callout = { title: '', body: '' }, chips = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[32px]" /></AnimFadeUp>
       <div className="flex-1 flex gap-[32px]">
@@ -179,7 +179,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  dark_panel_points: ({ darkPanel, points, orgName, pageNumber }) => (
+  dark_panel_points: ({ darkPanel = { title: '', subtitle: '' }, points = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex">
       <AnimFadeUp className="w-1/3 h-full bg-gray-900 text-white p-[58px] flex flex-col justify-center">
         <div data-pptx="rect" className="w-full h-full flex flex-col justify-center">
@@ -206,7 +206,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  stacked_rows_3: ({ title, rows, orgName, pageNumber }) => (
+  stacked_rows_3: ({ title, rows = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[32px]" /></AnimFadeUp>
       <AnimStaggerContainer className="flex-1 flex flex-col gap-[24px]">
@@ -228,7 +228,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  stats: ({ title, stats, orgName, pageNumber }) => (
+  stats: ({ title, stats = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[48px]" /></AnimFadeUp>
       <AnimStaggerContainer className="flex-1 flex items-center justify-around">
@@ -243,7 +243,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  timeline: ({ title, events, orgName, pageNumber }) => (
+  timeline: ({ title, events = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[48px]" /></AnimFadeUp>
       <div className="flex-1 relative flex items-center">
@@ -267,7 +267,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  process_steps: ({ title, steps, orgName, pageNumber }) => (
+  process_steps: ({ title, steps = [], orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[48px]" /></AnimFadeUp>
       <AnimStaggerContainer className="flex-1 flex gap-[24px]">
@@ -288,7 +288,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  comparison: ({ title, left, right, orgName, pageNumber }) => (
+  comparison: ({ title, left = { title: '', points: [] }, right = { title: '', points: [] }, orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[32px]" /></AnimFadeUp>
       <div className="flex-1 flex gap-[32px]">
@@ -372,7 +372,7 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  chart: ({ title, data, dataKey, xAxisKey, orgName, pageNumber }) => (
+  chart: ({ title, data = [], dataKey, xAxisKey, orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[32px]" /></AnimFadeUp>
       <AnimFadeUp className="flex-1 w-full" delay={0.1}>
