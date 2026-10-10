@@ -13,7 +13,9 @@
     "typecheck": "echo \"TODO\"",
     "test": "echo \"TODO\"",
     "models:list": "npx tsx agents/scripts/models-list.ts",
-    "check:openrouter": "npx tsx agents/scripts/check-openrouter.ts"
+    "check:openrouter": "npx tsx agents/scripts/check-openrouter.ts",
+    "agent:writer": "npx tsx agents/writer/index.ts",
+    "eval:writer": "npx tsx agents/scripts/eval-writer.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",

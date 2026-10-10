@@ -1,0 +1,10 @@
+[
+  { "topic": "Quarterly Sales Review for Q3", "audience": "Executive Board" },
+  { "topic": "Intro to Quantum Computing", "audience": "High School Students" },
+  { "topic": "The Future of AI in Healthcare", "audience": "Medical Professionals" },
+  { "topic": "How to start a successful podcast", "audience": "Beginners" },
+  { "topic": "Our company's new remote work policy", "audience": "All Employees" },
+  { "topic": "Sustainable energy solutions for urban cities", "audience": "City Planners" },
+  { "topic": "The history of the Roman Empire", "audience": "Undergraduate Students" },
+  { "topic": "Pitch deck for a new SaaS product called FlowSync", "audience": "Venture Capitalists" }
+]
