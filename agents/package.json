@@ -1,0 +1,8 @@
+{
+  "name": "@slidewright/agents",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.ts",
+  "dependencies": { "@slidewright/shared": "*", "zod": "^3.23.0" }
+}

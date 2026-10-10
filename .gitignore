@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+.env.local
+outputs/*
+!outputs/README.md
+!outputs/*/.gitkeep
+*.log
+.DS_Store

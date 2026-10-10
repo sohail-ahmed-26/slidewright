@@ -1,0 +1,25 @@
+{
+  "name": "slidewright",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "agents",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "typecheck": "echo \"TODO\"",
+    "test": "echo \"TODO\""
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "concurrently": "^10.0.6",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

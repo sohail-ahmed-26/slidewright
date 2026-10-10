@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Deck {
+  id        String   @id @default(cuid())
+  title     String?
+  prompt    String
+  status    String   @default("pending") // pending | running | ready | failed
+  design    Json?    // DesignSystem (from Designer)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  slides    Slide[]
+  jobs      Job[]
+  assets    Asset[]
+}
+
+model Slide {
+  id     String @id @default(cuid())
+  deckId String
+  n      Int
+  data   Json   // slide content + layout + diagram/image specs
+  deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@unique([deckId, n])
+}
+
+model Job {
+  id           String     @id @default(cuid())
+  deckId       String
+  status       String     @default("pending") // pending | running | done | failed | cancelled
+  currentStage String?    // plan | visuals | critic | ready
+  createdAt    DateTime   @default(now())
+  deck         Deck       @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  runs         AgentRun[]
+}
+
+model AgentRun {
+  id        String   @id @default(cuid())
+  jobId     String
+  agent     String   // writer | designer | visuals | critic
+  status    String   // running | done | failed
+  input     Json?
+  output    Json?
+  tokensIn  Int?
+  tokensOut Int?
+  ms        Int?
+  error     String?
+  createdAt DateTime @default(now())
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model Asset {
+  id     String @id @default(cuid())
+  deckId String
+  kind   String // image | screenshot | pptx
+  path   String // relative to outputs/
+  hash   String?
+  meta   Json?
+  deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+}
