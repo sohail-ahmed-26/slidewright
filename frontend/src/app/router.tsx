@@ -16,6 +16,7 @@ import { AgentConfig } from '../pages/AgentConfig';
 import { Settings } from '../pages/Settings';
 
 import DevPalettes from '../pages/DevPalettes';
+import DevDiagrams from '../pages/DevDiagrams';
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
       { path: 'dev/kit', element: <DevKit /> },
       { path: 'dev/slides', element: <DevSlides /> },
       { path: 'dev/palettes', element: <DevPalettes /> },
+      { path: 'dev/diagrams', element: <DevDiagrams /> },
     ]
   },
   {

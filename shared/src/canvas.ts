@@ -1,0 +1,3 @@
+export const CANVAS_WIDTH = 1366;
+export const CANVAS_HEIGHT = 768;
+export const CANVAS_ASPECT_RATIO = CANVAS_WIDTH / CANVAS_HEIGHT;

@@ -4,6 +4,7 @@ import * as Icons from 'lucide-react';
 import { AnimFadeUp, AnimStaggerContainer, AnimStaggerItem } from './SlideAnimations';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList, Cell } from 'recharts';
 import { cn } from '../../lib/utils';
+import { DiagramRenderer } from './diagrams';
 
 export const SlideLayouts: Record<string, React.FC<any>> = {
   cover: ({ title, subtitle, orgName }) => (
@@ -395,16 +396,19 @@ export const SlideLayouts: Record<string, React.FC<any>> = {
     </div>
   ),
 
-  diagram: ({ title, description, orgName, pageNumber }) => (
+  diagram: ({ title, description, diagramSpec, orgName, pageNumber }) => (
     <div className="w-full h-full flex flex-col p-[58px]">
       <AnimFadeUp><TitleWithAccent title={title} className="mb-[16px]" /></AnimFadeUp>
       {description && <AnimFadeUp delay={0.1}><p className="text-[19px] text-gray-600 mb-[32px]" data-pptx="text">{description}</p></AnimFadeUp>}
       <AnimFadeUp className="flex-1" delay={0.2}>
-        <div className="w-full h-full border-2 border-dashed border-border rounded-[12px] bg-muted/50 flex flex-col items-center justify-center text-muted-foreground" data-pptx="rect">
-          <Icons.GitMerge className="w-16 h-16 mb-4 opacity-50" data-pptx="icon" />
-          <p className="text-[19px] font-medium" data-pptx="text">Diagram Placeholder</p>
-          <p className="text-[16px] mt-2" data-pptx="text">Diagram renderer will replace this area.</p>
-        </div>
+        {diagramSpec ? (
+          <DiagramRenderer spec={diagramSpec} />
+        ) : (
+          <div className="w-full h-full border-2 border-dashed border-border rounded-[12px] bg-muted/50 flex flex-col items-center justify-center text-muted-foreground" data-pptx="rect">
+            <Icons.GitMerge className="w-16 h-16 mb-4 opacity-50" data-pptx="icon" />
+            <p className="text-[19px] font-medium" data-pptx="text">Diagram Placeholder</p>
+          </div>
+        )}
       </AnimFadeUp>
       <FooterBar orgName={orgName} pageNumber={pageNumber} />
     </div>

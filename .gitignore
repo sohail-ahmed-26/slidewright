@@ -8,3 +8,5 @@ outputs/*
 *.log
 .DS_Store
 backend/prisma/dev.db*
+test-results/
+scratch/

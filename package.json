@@ -11,13 +11,15 @@
   "scripts": {
     "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
     "typecheck": "echo \"TODO\"",
-    "test": "echo \"TODO\"",
+    "test": "npm run test --workspaces --if-present",
     "models:list": "npx tsx agents/scripts/models-list.ts",
     "check:openrouter": "npx tsx agents/scripts/check-openrouter.ts",
     "agent:writer": "npx tsx agents/writer/index.ts",
     "eval:writer": "npx tsx agents/scripts/eval-writer.ts",
     "agent:designer": "npx tsx agents/designer/index.ts",
-    "eval:designer": "npx tsx agents/scripts/eval-designer.ts"
+    "eval:designer": "npx tsx agents/scripts/eval-designer.ts",
+    "agent:visuals": "npx tsx agents/visuals/index.ts",
+    "eval:visuals": "npx tsx agents/scripts/eval-visuals.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",
