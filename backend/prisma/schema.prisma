@@ -13,6 +13,7 @@ model Deck {
   prompt    String
   status    String   @default("pending") // pending | running | ready | failed
   design    String?    // DesignSystem JSON (from Designer)
+  data      String?    // JSON representation of full deck
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   slides    Slide[]
@@ -63,4 +64,34 @@ model Asset {
   hash   String?
   meta   String? // JSON string
   deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+}
+
+model AgentConfig {
+  id           String          @id @default(cuid())
+  name         String          @unique // writer, designer, visuals, critic
+  model        String
+  enabled      Boolean         @default(true)
+  customPrompt String?
+  params       String?         // JSON
+  versions     PromptVersion[]
+}
+
+model PromptVersion {
+  id        String      @id @default(cuid())
+  agentId   String
+  prompt    String
+  createdAt DateTime    @default(now())
+  agent     AgentConfig @relation(fields: [agentId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String // JSON string
+}
+
+model OptionPreset {
+  id      String @id @default(cuid())
+  name    String @unique
+  options String // JSON string
 }

@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { callOpenRouter } from '../llm/openrouter';
+import { callLLM } from '../llm/openrouter';
 import { getDesignerSystemPrompt } from './prompt';
 import { DesignerLLMOutputSchema, DesignerOutput, generatePalette } from '@slidewright/shared';
 import fs from 'fs';
@@ -80,8 +80,8 @@ export async function runDesigner(options: DesignerOptions): Promise<DesignerOut
         rationale: "Testing mock generator."
       });
     } else {
-      jsonStr = await callOpenRouter({
-        model: 'google/gemini-2.5-flash',
+      jsonStr = await callLLM({
+        model: process.env.MODEL_TEXT || 'openai/gpt-4o-mini',
         systemPrompt,
         userPrompt,
         mockMode: false,

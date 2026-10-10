@@ -17,7 +17,21 @@ Decide:
 - rationale: a one-sentence rationale.
 
 No neon, no random hex values. 
-Output ONLY JSON matching the requested schema.`;
+Output ONLY JSON matching this exact schema:
+{
+  "hue": number (0-360),
+  "accentHue": number | null,
+  "fontHeading": string,
+  "fontBody": string,
+  "radius": "8" | "16" | "24" | "pill",
+  "shadow": "soft" | "crisp" | "none",
+  "cardStyle": "tinted" | "outlined",
+  "iconShape": "circle" | "rounded-square",
+  "motif": "none" | "dots" | "thin-grid" | "soft-shapes" | "big-outline-number",
+  "imageStyle": string,
+  "moodName": string,
+  "rationale": string
+}`;
 
   const fontsList = `\n\nOFFICE SAFE FONTS ALLOW-LIST:\n${OFFICE_SAFE_FONTS.map(f => `- ${f}`).join('\n')}`;
 

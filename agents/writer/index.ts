@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { callOpenRouter } from '../llm/openrouter';
+import { callLLM } from '../llm/openrouter';
 import { getWriterSystemPrompt } from './prompt';
 import { validateDeck } from './validator';
 import { WriterOutputSchema, WriterOutput } from '@slidewright/shared';
@@ -20,8 +20,8 @@ export async function runWriter(options: WriterOptions): Promise<WriterOutput> {
   const userPrompt = `Topic: ${options.topic}\nAudience: ${options.audience}\nLanguage: ${options.language}\nTone: ${options.tone}\nSlide count: ${options.slides}`;
 
   console.log(`[Writer] Generating initial draft...`);
-  const initialJsonStr = await callOpenRouter({
-    model: 'google/gemini-2.5-flash', // Default
+  const initialJsonStr = await callLLM({
+    model: process.env.MODEL_TEXT || 'openai/gpt-4o-mini',
     systemPrompt,
     userPrompt,
     mockMode: options.mockMode
@@ -55,8 +55,8 @@ export async function runWriter(options: WriterOptions): Promise<WriterOutput> {
   const rewriteUserPrompt = `Your previous output had the following violations:\n${violations.map(v => `- Slide ${v.index}: ${v.message}`).join('\n')}
 Please fix ONLY these issues and return the complete valid JSON deck again. Ensure slot limits and layout sequence rules are perfectly respected.`;
 
-  const rewriteJsonStr = await callOpenRouter({
-    model: 'google/gemini-2.5-flash',
+  const rewriteJsonStr = await callLLM({
+    model: process.env.MODEL_TEXT || 'openai/gpt-4o-mini',
     systemPrompt,
     userPrompt: `${userPrompt}\n\n[SYSTEM: REWRITE REQUEST]\n${rewriteUserPrompt}`,
     mockMode: false

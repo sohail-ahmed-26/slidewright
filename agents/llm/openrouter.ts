@@ -8,7 +8,7 @@ export interface OpenRouterOptions {
   temperature?: number;
 }
 
-export async function callOpenRouter(options: OpenRouterOptions): Promise<string> {
+export async function callLLM(options: OpenRouterOptions): Promise<string> {
   if (options.mockMode) {
     console.log(`[Mock OpenRouter] Generating response for model: ${options.model}`);
     return await generateMockResponse(options);
@@ -94,4 +94,16 @@ async function generateMockResponse(options: OpenRouterOptions): Promise<string>
   });
 
   return JSON.stringify({ slides });
+}
+
+export async function generateImage(prompt: string, model: string, mockMode: boolean): Promise<string> {
+  if (mockMode) {
+    return 'https://via.placeholder.com/800x600?text=' + encodeURIComponent(prompt.substring(0, 50));
+  }
+  
+  // OpenRouter doesn't typically handle standard DALL-E image generation endpoint natively in all setups.
+  // Using pollinations.ai as a reliable, free image generator fallback for the demo.
+  const seed = Math.floor(Math.random() * 1000000);
+  const encodedPrompt = encodeURIComponent(prompt);
+  return `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=1&seed=${seed}`;
 }

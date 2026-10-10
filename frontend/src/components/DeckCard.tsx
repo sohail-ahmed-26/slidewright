@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { Card, CardContent } from './ui/card';
 import { SlideRenderer } from './slide/SlideRenderer';
 import { Button } from './ui/button';
@@ -84,7 +85,17 @@ export function DeckCard({ deck }: { deck: Deck }) {
                   <Copy className="h-4 w-4 mr-2" /> Duplicate
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => alert("Download mock")}>
+                <DropdownMenuItem onClick={async () => {
+                  try {
+                    toast.info("Exporting PPTX...");
+                    const { api } = await import('../lib/api');
+                    const url = await api.exportPptx(deck.id);
+                    toast.success("PPTX Export complete!");
+                    window.location.href = url;
+                  } catch (e: any) {
+                    toast.error(e.message || "Failed to export PPTX");
+                  }
+                }}>
                   <Download className="h-4 w-4 mr-2" /> Download PPTX
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

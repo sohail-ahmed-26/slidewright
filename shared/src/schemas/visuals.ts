@@ -34,8 +34,8 @@ export type ImageSpec = z.infer<typeof ImageSpecSchema>;
 export const VisualsLLMOutputSchema = z.object({
   slides: z.array(z.object({
     slideId: z.string(), // ID of the slide
-    diagram: DiagramSpecSchema.optional(),
-    image: ImageSpecSchema.optional()
+    diagram: DiagramSpecSchema.nullish(),
+    image: ImageSpecSchema.nullish()
   }))
 });
 

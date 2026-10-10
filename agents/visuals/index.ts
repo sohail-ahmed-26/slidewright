@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { callOpenRouter } from '../llm/openrouter';
+import { callLLM } from '../llm/openrouter';
 import { getVisualsSystemPrompt } from './prompt';
 import { VisualsLLMOutputSchema, VisualsLLMOutput, DiagramSpec, ImageSpec } from '@slidewright/shared';
 import fs from 'fs';
@@ -20,16 +20,17 @@ async function evaluateImage(prompt: string, imageUrl: string, mockMode: boolean
   }
   
   // Real vision model call
-  const system = "You are an image evaluator. Rate how well this image clearly shows the requested subject on a scale of 0-10. Output ONLY the number.";
+  const system = "You are an image evaluator. Rate how well this image clearly shows the requested subject on a scale of 0-10. Output ONLY JSON matching this exact schema:\n{\n  \"score\": number\n}";
   const user = `Prompt: ${prompt}\nImage URL: ${imageUrl}`;
   try {
-    const response = await callOpenRouter({
-      model: 'google/gemini-2.5-flash',
+    const response = await callLLM({
+      model: process.env.MODEL_VISION || 'openai/gpt-4o-mini',
       systemPrompt: system,
       userPrompt: user,
       mockMode: false
     });
-    return parseInt(response.trim()) || 0;
+    const parsed = JSON.parse(response);
+    return parsed.score || 0;
   } catch(e) {
     console.error("Vision eval failed:", e);
     return 0;
@@ -108,8 +109,8 @@ export async function runVisuals(options: VisualsOptions): Promise<any> {
     });
     jsonStr = JSON.stringify({ slides: slidesOutput });
   } else {
-    jsonStr = await callOpenRouter({
-      model: 'google/gemini-2.5-flash',
+    jsonStr = await callLLM({
+      model: process.env.MODEL_TEXT || 'openai/gpt-4o-mini',
       systemPrompt,
       userPrompt,
       mockMode: false

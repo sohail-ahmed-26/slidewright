@@ -73,30 +73,35 @@ class MockApi implements Api {
 }
 
 class HttpApi implements Api {
-  // Stub for future HTTP calls
-  async listDecks() { return []; }
-  async getDeck(id: string) { return null; }
-  async createDeck(prompt: string) { return null; }
-  async getRun(id: string) { return null; }
-  subscribeRun(id: string, onUpdate: (data: any) => void) { return () => {}; }
+  async listDecks() { const r = await fetch('/api/decks'); return r.json(); }
+  async getDeck(id: string) { const r = await fetch(`/api/decks/${id}`); return r.json(); }
+  async createDeck(prompt: string) { const r = await fetch('/api/decks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) }); return r.json(); }
+  async getRun(id: string) { const r = await fetch(`/api/jobs/${id}`); return r.json(); }
+  
+  subscribeRun(id: string, onUpdate: (data: any) => void) {
+    const sse = new EventSource(`/api/jobs/${id}/events`);
+    sse.onmessage = (e) => onUpdate(JSON.parse(e.data));
+    return () => sse.close();
+  }
+  
   async retryStage(runId: string) {}
   async cancelRun(runId: string) {}
   async regenerateSlide(deckId: string, slideId: string, prompt: string) { return {}; }
   async restyleDeck(deckId: string, instructions: string) { return {}; }
-  async renameDeck(deckId: string, title: string) { return {}; }
-  async duplicateDeck(deckId: string) { return {}; }
-  async deleteDeck(deckId: string) {}
+  async renameDeck(deckId: string, title: string) { const r = await fetch(`/api/decks/${deckId}/rename`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title }) }); return r.json(); }
+  async duplicateDeck(deckId: string) { const r = await fetch(`/api/decks/${deckId}/duplicate`, { method: 'POST' }); return r.json(); }
+  async deleteDeck(deckId: string) { await fetch(`/api/decks/${deckId}`, { method: 'DELETE' }); }
   async updateSlide(deckId: string, slideId: string, content: any) { return {}; }
-  async exportPptx(deckId: string) { return ""; }
-  async getAgentConfigs() { return []; }
+  async exportPptx(deckId: string) { const r = await fetch(`/api/export/${deckId}`, { method: 'POST' }); const res = await r.json(); return res.url; }
+  async getAgentConfigs() { const r = await fetch('/api/agents'); return r.json(); }
   async saveAgentConfig(name: string, config: any) {}
-  async getAgentPrompt(name: string) { return ""; }
-  async saveAgentPrompt(name: string, prompt: string) {}
-  async resetAgentPrompt(name: string) {}
+  async getAgentPrompt(name: string) { const r = await fetch(`/api/agents/${name}/prompt`); const res = await r.json(); return res.prompt; }
+  async saveAgentPrompt(name: string, prompt: string) { await fetch(`/api/agents/${name}/prompt`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) }); }
+  async resetAgentPrompt(name: string) { await fetch(`/api/agents/${name}/reset`, { method: 'POST' }); }
   async runAgentTest(name: string, input: any) { return {}; }
-  async listModels() { return []; }
-  async getSettings() { return {}; }
-  async saveSettings(settings: any) {}
+  async listModels() { const r = await fetch('/api/models'); return r.json(); }
+  async getSettings() { const r = await fetch('/api/settings'); return r.json(); }
+  async saveSettings(settings: any) { await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) }); }
 }
 
 const isMock = import.meta.env.VITE_API_MODE !== 'http';

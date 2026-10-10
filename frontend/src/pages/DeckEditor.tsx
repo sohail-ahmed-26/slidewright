@@ -32,6 +32,8 @@ export function DeckEditor() {
   const [activeSlideIdx, setActiveSlideIdx] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
   const [titleEdit, setTitleEdit] = useState('');
 
   useEffect(() => {
@@ -302,11 +304,41 @@ export function DeckEditor() {
           <DialogHeader>
             <DialogTitle>Download PPTX</DialogTitle>
             <DialogDescription>
-              Exporting to PPTX requires the backend python service. The PPTX export arrives in the backend step.
+              Export your presentation as a fully editable PowerPoint file.
+              <br/><br/>
+              <em>Note: Animations shown in the browser preview are for presentation purposes only and are not currently exported to the PPTX file.</em>
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end pt-4">
-            <Button onClick={() => setExportOpen(false)}>Okay</Button>
+          
+          {exportError && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200">
+              {exportError}
+            </div>
+          )}
+          
+          <div className="flex justify-end pt-4 gap-2">
+            <Button variant="outline" onClick={() => setExportOpen(false)} disabled={isExporting}>Cancel</Button>
+            <Button 
+              disabled={isExporting} 
+              onClick={async () => {
+                try {
+                  setIsExporting(true);
+                  setExportError('');
+                  const { api } = await import('../lib/api');
+                  const url = await api.exportPptx(deck.id);
+                  toast.success("PPTX Export complete!");
+                  window.location.href = url; // trigger download
+                  setExportOpen(false);
+                } catch (e: any) {
+                  setExportError(e.message || "Failed to export PPTX");
+                } finally {
+                  setIsExporting(false);
+                }
+              }}
+            >
+              {isExporting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {isExporting ? 'Exporting...' : 'Download'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

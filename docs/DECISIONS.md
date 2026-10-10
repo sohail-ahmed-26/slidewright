@@ -16,3 +16,6 @@
 
 **Faisla**: Use `pages/` and `components/` instead of a domain-driven `features/` structure in the frontend.
 **Wajah**: For a straightforward application size, flattening components and pages is simpler and adheres to standard Vite/React scaffolding patterns without over-engineering.
+
+**Faisla**: Fall back to layout-specific `pptxgenjs` mapping fed by the same tokens for PPTX export instead of `html2pptx` or DOM Extractor.
+**Wajah**: `html2pptx` is outdated and cannot handle complex layouts accurately. The DOM Extractor via Playwright is prone to environmental dependency issues (e.g., 404 driver downloads on Windows). The custom `pptxgenjs` approach natively guarantees high fidelity for our specific layout templates without external browser dependencies.

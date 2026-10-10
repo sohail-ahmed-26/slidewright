@@ -5,16 +5,14 @@ import express from 'express'
 
 export default defineConfig({
   plugins: [
-    react(),
-    {
-      name: 'serve-outputs',
-      configureServer(server) {
-        server.middlewares.use('/outputs', express.static(path.resolve(import.meta.dirname, '../outputs')))
-      }
-    }
+    react()
   ],
   server: {
-    port: 5173
+    port: 5173,
+    proxy: {
+      '/api': 'http://localhost:4000',
+      '/outputs': 'http://localhost:4000'
+    }
   },
   resolve: {
     alias: {

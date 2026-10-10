@@ -14,6 +14,9 @@ app.use('/outputs', express.static(outputsDir));
 
 import { prisma } from './db';
 
+import { apiRouter } from './api';
+app.use('/api', apiRouter);
+
 app.get('/api/health', async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;

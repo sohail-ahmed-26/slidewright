@@ -1,6 +1,10 @@
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
   const url = process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1';
@@ -17,7 +21,7 @@ async function main() {
 
   console.log(`Using models: TEXT=${textModel}, VISION=${visionModel}, IMAGE=${imageModel}`);
   
-  const logsDir = path.resolve(__dirname, '../../../outputs/logs');
+  const logsDir = path.resolve(__dirname, '../../outputs/logs');
   if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
   }
@@ -54,11 +58,13 @@ async function main() {
   await doCall({
     model: textModel,
     messages: [{ role: 'user', content: 'Say "hello world" in JSON format { "greeting": "..." }' }],
-    response_format: { type: 'json_object' }
+    response_format: { type: 'json_object' },
+    max_tokens: 500
   }, 'Text JSON Call');
 
   await doCall({
     model: visionModel,
+    max_tokens: 500,
     messages: [
       {
         role: 'user',
@@ -70,10 +76,16 @@ async function main() {
     ]
   }, 'Vision Call');
 
-  await doCall({
-    model: imageModel,
-    prompt: 'A cute baby dragon',
-  }, 'Image Generation Call');
+  console.log(`Running Image Generation Call...`);
+  try {
+    const { generateImage } = await import('../llm/openrouter.ts');
+    const url = await generateImage('A cute baby dragon', imageModel, false);
+    fs.appendFileSync(logFile, `Image Generation Call SUCCESS: {"url": "${url}"}\n\n`);
+    console.log(`Image Generation Call succeeded.`);
+  } catch (e: any) {
+    fs.appendFileSync(logFile, `Image Generation Call FETCH ERROR: ${e.message}\n\n`);
+    console.error(`Image Generation Call threw an error.`);
+  }
 }
 
 main().catch(console.error);
