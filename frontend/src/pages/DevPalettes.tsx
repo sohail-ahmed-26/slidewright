@@ -47,9 +47,9 @@ export default function DevPalettes() {
             
             {/* Color Swatches */}
             <div className="flex rounded overflow-hidden h-12 shadow-sm border border-gray-200">
-              <div className="flex-1" style={{ backgroundColor: \`hsl(\${design.theme.primary})\` }} title="Primary"></div>
-              <div className="flex-1" style={{ backgroundColor: \`hsl(\${design.theme.muted})\` }} title="Muted"></div>
-              {design.theme.accent && <div className="flex-1" style={{ backgroundColor: \`hsl(\${design.theme.accent})\` }} title="Accent"></div>}
+              <div className="flex-1" style={{ backgroundColor: `hsl(${design.theme.primary})` }} title="Primary"></div>
+              <div className="flex-1" style={{ backgroundColor: `hsl(${design.theme.muted})` }} title="Muted"></div>
+              {design.theme.accent && <div className="flex-1" style={{ backgroundColor: `hsl(${design.theme.accent})` }} title="Accent"></div>}
             </div>
 
             {/* Sample Slides (Scaled down) */}
@@ -57,8 +57,8 @@ export default function DevPalettes() {
               <Card 
                 className="flex-1 aspect-video flex flex-col justify-center items-center text-center p-4" 
                 style={{
-                  backgroundColor: \`hsl(\${design.theme.primary})\`,
-                  color: \`hsl(\${design.theme.primaryForeground})\`,
+                  backgroundColor: `hsl(${design.theme.primary})`,
+                  color: `hsl(${design.theme.primaryForeground})`,
                   fontFamily: design.fontHeading
                 }}
               >
@@ -72,8 +72,8 @@ export default function DevPalettes() {
               >
                 <div className="w-full h-full flex flex-col" style={{ '--primary': design.theme.primary, '--muted': design.theme.muted } as any}>
                   <TitleWithAccent title="Key Insight" className="mb-2 text-sm" />
-                  <div className="flex-1 rounded p-2" style={{ backgroundColor: \`hsl(\${design.theme.muted})\`, borderRadius: design.radius === 'pill' ? '999px' : \`\${design.radius}px\` }}>
-                    <p className="text-xs" style={{ color: \`hsl(\${design.theme.mutedForeground})\` }}>This card shows the radius ({design.radius}px) and tinted style.</p>
+                  <div className="flex-1 rounded p-2" style={{ backgroundColor: `hsl(${design.theme.muted})`, borderRadius: design.radius === 'pill' ? '999px' : `${design.radius}px` }}>
+                    <p className="text-xs" style={{ color: `hsl(${design.theme.mutedForeground})` }}>This card shows the radius ({design.radius}px) and tinted style.</p>
                   </div>
                 </div>
               </Card>
