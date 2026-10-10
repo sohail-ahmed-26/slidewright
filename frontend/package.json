@@ -7,14 +7,19 @@
     "dev": "vite"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.4.0",
     "@slidewright/shared": "*",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "autoprefixer": "^10.6.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.54.0",
     "postcss": "^8.5.29",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.3",
     "vite": "^8.3.4"
   }

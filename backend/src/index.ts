@@ -1,10 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { PrismaClient } from '@prisma/client';
 
 const app = express();
-const port = 3000;
+const port = process.env.BACKEND_PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
@@ -13,8 +12,7 @@ app.use(express.json());
 const outputsDir = path.resolve(__dirname, '../../outputs');
 app.use('/outputs', express.static(outputsDir));
 
-
-const prisma = new PrismaClient();
+import { prisma } from './db';
 
 app.get('/api/health', async (req, res) => {
   try {

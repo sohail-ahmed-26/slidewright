@@ -7,3 +7,4 @@ outputs/*
 !outputs/*/.gitkeep
 *.log
 .DS_Store
+backend/prisma/dev.db*

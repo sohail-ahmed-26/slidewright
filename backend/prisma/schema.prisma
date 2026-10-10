@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -12,7 +12,7 @@ model Deck {
   title     String?
   prompt    String
   status    String   @default("pending") // pending | running | ready | failed
-  design    Json?    // DesignSystem (from Designer)
+  design    String?    // DesignSystem JSON (from Designer)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   slides    Slide[]
@@ -24,7 +24,7 @@ model Slide {
   id     String @id @default(cuid())
   deckId String
   n      Int
-  data   Json   // slide content + layout + diagram/image specs
+  data   String   // slide content JSON + layout + diagram/image specs
   deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
 
   @@unique([deckId, n])
@@ -45,8 +45,8 @@ model AgentRun {
   jobId     String
   agent     String   // writer | designer | visuals | critic
   status    String   // running | done | failed
-  input     Json?
-  output    Json?
+  input     String? // JSON string
+  output    String? // JSON string
   tokensIn  Int?
   tokensOut Int?
   ms        Int?
@@ -61,6 +61,6 @@ model Asset {
   kind   String // image | screenshot | pptx
   path   String // relative to outputs/
   hash   String?
-  meta   Json?
+  meta   String? // JSON string
   deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
 }

@@ -20,6 +20,6 @@ user prompt -> backend/orchestrator -> [agents/writer || agents/designer] -> age
 
 ## Quick start (Prompt 0 mein poora hoga)
 1. `copy .env.example .env` aur OPENROUTER_API_KEY daalein (ya USE_MOCK_LLM=true rakhein)
-2. `npm run db:up`
-3. `npm install`
+2. `npm install`
+3. `npm run db:push` (backend folder se, SQLite `dev.db` banane ke liye)
 4. `npm run dev`
