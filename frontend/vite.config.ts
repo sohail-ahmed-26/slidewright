@@ -9,7 +9,7 @@ export default defineConfig({
     {
       name: 'serve-outputs',
       configureServer(server) {
-        server.middlewares.use('/outputs', express.static(path.resolve(__dirname, '../outputs')))
+        server.middlewares.use('/outputs', express.static(path.resolve(import.meta.dirname, '../outputs')))
       }
     }
   ],
@@ -18,7 +18,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
 })

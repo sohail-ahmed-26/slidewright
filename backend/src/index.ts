@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve outputs statically
-const outputsDir = path.resolve(__dirname, '../../outputs');
+const outputsDir = path.resolve(import.meta.dirname, '../../outputs');
 app.use('/outputs', express.static(outputsDir));
 
 import { prisma } from './db';
