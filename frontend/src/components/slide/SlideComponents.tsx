@@ -46,8 +46,8 @@ export function ChipTag({ children, className }: { children: React.ReactNode, cl
 export function BigNumber({ number, label, className }: { number: string, label: string, className?: string }) {
   return (
     <div className={cn("flex flex-col items-center justify-center", className)} data-pptx="rect">
-      <span className="text-[120px] font-bold text-primary leading-none" data-pptx="text">{number}</span>
-      <span className="text-[21px] font-medium text-muted-foreground mt-2" data-pptx="text">{label}</span>
+      <div className="text-[120px] font-bold text-primary" data-pptx="text">{number}</div>
+      <div className="text-[21px] font-medium text-muted-foreground mt-2" data-pptx="text">{label}</div>
     </div>
   );
 }

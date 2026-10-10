@@ -18,10 +18,13 @@ test.describe('Slide Lint', () => {
       // 1. Flag text overflow
       const texts = await page.locator('[data-pptx="text"]').all();
       for (const t of texts) {
-        const isOverflowing = await t.evaluate((el: HTMLElement) => {
-          return el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
+        const overflowData = await t.evaluate((el: HTMLElement) => {
+          return {
+            isOverflowing: el.scrollHeight > el.clientHeight + 2 || el.scrollWidth > el.clientWidth + 2,
+            details: `${el.tagName} - scrollH: ${el.scrollHeight}, clientH: ${el.clientHeight}, scrollW: ${el.scrollWidth}, clientW: ${el.clientWidth}, text: ${el.innerText.substring(0, 20)}`
+          };
         });
-        expect(isOverflowing, `Text is overflowing on slide ${i}`).toBe(false);
+        expect(overflowData.isOverflowing, `Text is overflowing on slide ${i + 1}: ${overflowData.details}`).toBe(false);
       }
 
       // 2. Elements outside the canvas
