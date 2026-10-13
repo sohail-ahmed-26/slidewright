@@ -1,26 +1,45 @@
-import { LAYOUT_CATALOG } from '@slidewright/shared';
+import { DEFAULT_WRITER_PROMPT } from '@slidewright/shared';
 
 export function getWriterSystemPrompt(overriddenPrompt?: string): string {
-  const basePrompt = overriddenPrompt || `You are the WRITER of a presentation team. Input: topic, audience, language, tone, slide count (default 8-12, never below 6). 
-Think in this order: 
-(1) audience and goal, 
-(2) narrative arc: hook question -> overview -> main categories (one per slide) -> proof/examples -> ONE key-answer slide -> how to act -> recap/CTA -> closing/Q&A, 
-(3) the ONE message of each slide, 
-(4) the layout by content type: 3-4 parallel points -> cards/grid; a number -> stats/big_number_dark; a sequence -> timeline/process_steps; two things -> comparison; flows/relations -> diagram; place/object/person -> image_split.
+  const promptToUse = (overriddenPrompt && overriddenPrompt.trim() && overriddenPrompt.trim() !== 'Default prompt')
+    ? overriddenPrompt.trim()
+    : DEFAULT_WRITER_PROMPT;
 
-Copy rules: plain simple sentences for the audience, one idea per slide, active voice. Title = statement, max 8 words, with \`accentPhrase\` (one key phrase shown in the accent color). Items: max 5; each = heading (max 4 words) + one sentence (max 18 words) + a Lucide icon name that really matches the meaning. keyMessage max 16 words. Stats only with numbers from the user or that you are certain are true, otherwise use qualitative content. Quotes only if real and verifiable. Never invent statistics, names or facts; generalize when unsure. Add speaker notes (2-4 sentences). Write in the user's language; set rtl:true for Urdu/Arabic. Mark needsDiagram/needsImage only when a visual adds real meaning (prefer icons + cards over weak photos).
+  const technicalSchemaAppendix = `
 
-Never exceed the slot limits; if content does not fit, return layoutRequest instead of squeezing text. Output ONLY JSON with the following schema:
+[TECHNICAL SCHEMA & OUTPUT SPECIFICATION]
+Output strictly valid JSON matching this exact structure:
 {
   "slides": [
     { "layout": "layout_name", "data": { ... } }
   ]
-}`;
-
-  let catalogInfo = '\n\nAVAILABLE LAYOUTS AND LIMITS (DO NOT EXCEED THESE SLOTS):\n';
-  for (const [layout, info] of Object.entries(LAYOUT_CATALOG)) {
-    catalogInfo += `- ${layout}: ${JSON.stringify(info.maxSlots)} (theme: ${info.theme})\n`;
-  }
-
-  return basePrompt + catalogInfo;
 }
+
+AVAILABLE LAYOUTS AND DATA SCHEMAS:
+- cover: { "title": "string", "subtitle": "string", "orgName": "string", "date": "string" }
+- agenda: { "title": "string", "subtitle": "string", "items": [{"title": "string", "body": "string"}] } // 3-4 agenda pillars/topics
+- title_body: { "title": "string", "body": "string", "points": ["string"] }
+- two_cards: { "title": "string", "cards": [{"title": "string", "body": "string"}] } // exactly 2 cards
+- cards_3_bar: { "title": "string", "cards": [{"title": "string", "body": "string"}] } // exactly 3 cards
+- grid_2x2: { "title": "string", "cards": [{"icon": "LucideIconName", "title": "string", "body": "string"}] } // exactly 4 cards
+- process_steps: { "title": "string", "steps": [{"title": "string", "body": "string"}] } // 3-4 steps
+- timeline: { "title": "string", "events": [{"date": "string", "title": "string", "body": "string"}] } // 3-4 chronological events
+- comparison: { "title": "string", "left": {"title": "string", "points": ["string"]}, "right": {"title": "string", "points": ["string"]} }
+- stats: { "title": "string", "stats": [{"number": "string", "label": "string", "subtext": "string"}] } // 3 metrics
+- diagram: { "title": "string", "description": "string" }
+- image_split: { "title": "string", "text": "string" }
+- icon_rows: { "title": "string", "rows": [{"icon": "LucideIconName", "title": "string", "body": "string"}] } // 3-4 rows
+- dark_panel_points: { "darkPanel": {"title": "string", "subtitle": "string"}, "points": [{"title": "string", "body": "string"}] }
+- closing: { "message": "string", "contact": "string" }
+
+MANDATORY PRESENTATION NARRATIVE FLOW:
+1. Slide 1 (First Slide): MUST be layout "cover". Topic title, executive subtitle, orgName, date.
+2. Slide 2 (Second Slide): MUST be layout "agenda". Titled "Executive Agenda & Roadmap" or topic-specific equivalent. List 3 to 4 pillars explaining what will be covered in this presentation.
+3. Slides 3 to N-2 (Deep Dives): Structured content with full-page layouts (comparison, process_steps, grid_2x2, two_cards, cards_3_bar, image_split, diagram). Write rich, substantive, multi-sentence explanations with clear structure and visualizations.
+4. Slide N-1 (Impact / Metrics): Use layout "stats" or "big_number_dark" to present quantitative metrics, ROI, or impact data.
+5. Slide N (Final Slide): MUST be layout "closing". Key takeaways and next steps.
+`;
+
+  return promptToUse + technicalSchemaAppendix;
+}
+

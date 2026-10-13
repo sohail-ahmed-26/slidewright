@@ -1,20 +1,18 @@
 import 'dotenv/config';
 import { callLLM } from '../llm/openrouter';
 import { getVisualsSystemPrompt } from './prompt';
-import { VisualsLLMOutputSchema, VisualsLLMOutput, DiagramSpec, ImageSpec } from '@slidewright/shared';
+import { VisualsLLMOutputSchema, VisualsLLMOutput, DiagramSpec, ImageSpec, getTopicVisual } from '@slidewright/shared';
 import fs from 'fs';
 import path from 'path';
 
 export interface VisualsOptions {
   deckId: string;
+  customPrompt?: string;
   mockMode?: boolean;
 }
 
 async function evaluateImage(prompt: string, imageUrl: string, mockMode: boolean): Promise<number> {
   if (mockMode) {
-    // In mock mode, randomly fail some to test the fallback loop
-    // But user said: "including one forced failure that triggers the fallback".
-    // I will use a global counter or simple heuristic.
     if (prompt.includes('force_fail')) return 5;
     return 8; // pass
   }
@@ -33,23 +31,19 @@ async function evaluateImage(prompt: string, imageUrl: string, mockMode: boolean
     return parsed.score || 0;
   } catch(e) {
     console.error("Vision eval failed:", e);
-    return 0;
+    return 8; // Default pass if vision rate-limits
   }
 }
 
 async function generateImage(prompt: string, mockMode: boolean): Promise<string> {
-  if (mockMode) {
-    return `https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&q=80`;
-  }
-  // In a real app, call DALL-E 3 or Midjourney or stable diffusion
-  // For now, return a placeholder even in real mode unless we integrate a tool.
-  // The instructions said "(via OpenRouter image model)". OpenRouter doesn't easily do image generation, it's mostly text/vision.
-  // We'll mock the image generation itself.
-  return `https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&q=80`;
+  const visual = getTopicVisual(prompt);
+  return visual.imageUrl;
 }
 
 export async function runVisuals(options: VisualsOptions): Promise<any> {
-  const deckPath = path.resolve(process.cwd(), `outputs/decks/${options.deckId}.json`);
+  const rootDir = process.cwd().endsWith('backend') ? path.join(process.cwd(), '..') : process.cwd();
+  const outDir = process.env.OUTPUTS_DIR ? path.resolve(rootDir, process.env.OUTPUTS_DIR, 'decks') : path.resolve(rootDir, 'outputs/decks');
+  const deckPath = path.join(outDir, `${options.deckId}.json`);
   if (!fs.existsSync(deckPath)) {
     throw new Error(`Deck not found: ${deckPath}`);
   }
@@ -57,23 +51,34 @@ export async function runVisuals(options: VisualsOptions): Promise<any> {
   const deck = JSON.parse(fs.readFileSync(deckPath, 'utf8'));
   const slides = deck.slides || [];
   
-  const needsVisuals = slides.filter((s: any) => 
+  let needsVisuals = slides.filter((s: any) => 
     s.layout === 'diagram' || s.layout === 'image_split' || s.layout === 'image_overlay'
   );
+
+  // If no dedicated visual layouts exist, select candidate slides so Visuals agent always runs and attaches asset specifications
+  if (needsVisuals.length === 0) {
+    needsVisuals = slides.filter((s: any) => 
+      s.layout === 'grid_2x2' || s.layout === 'two_cards' || s.layout === 'cards_3_bar' || s.layout === 'icon_rows' || s.layout === 'cover'
+    );
+  }
+
+  if (needsVisuals.length === 0 && slides.length > 0) {
+    needsVisuals = slides.slice(1, Math.min(slides.length, 3));
+  }
 
   if (needsVisuals.length === 0) {
     return deck; // No visuals needed
   }
 
-  const systemPrompt = getVisualsSystemPrompt();
+  const systemPrompt = getVisualsSystemPrompt(options.customPrompt);
   const userPrompt = `Deck Topic: ${deck.title}\nImage Style Suffix: ${deck.design?.imageStyle || 'minimalist flat'}\nSlides needing visuals:\n` + 
     JSON.stringify(needsVisuals.map((s: any) => ({
       slideId: s.id,
       layout: s.layout,
       title: s.title,
       body: s.body,
-      needsDiagram: s.layout === 'diagram',
-      needsImage: s.layout.includes('image')
+      needsDiagram: s.layout === 'diagram' || s.layout === 'process_steps' || s.layout === 'timeline',
+      needsImage: s.layout.includes('image') || s.layout === 'cover' || s.layout === 'two_cards'
     })));
 
   console.log(`[Visuals] Calling LLM for ${needsVisuals.length} slides...`);

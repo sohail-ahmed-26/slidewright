@@ -3,6 +3,14 @@ export const LAYOUT_CATALOG = {
     maxSlots: { title: 1, subtitle: 1 },
     theme: 'dark'
   },
+  agenda: {
+    maxSlots: { items: 4 },
+    theme: 'light'
+  },
+  title_body: {
+    maxSlots: { title: 1, body: 1, points: 5 },
+    theme: 'light'
+  },
   two_cards: {
     maxSlots: { cards: 2 },
     theme: 'light'
@@ -20,7 +28,7 @@ export const LAYOUT_CATALOG = {
     theme: 'light' // Mixed, but counts as light for rhythm
   },
   big_number_dark: {
-    maxSlots: { number: 1, label: 1 },
+    maxSlots: { number: 1, label: 1, title: 1, baseline: 1, takeaways: 3 },
     theme: 'dark'
   },
   cards_3_bar: {

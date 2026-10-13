@@ -5,8 +5,11 @@ dist
 outputs/*
 !outputs/README.md
 !outputs/*/.gitkeep
+backend/outputs/
 *.log
 .DS_Store
 backend/prisma/dev.db*
 test-results/
 scratch/
+references/ui/extracted/
+

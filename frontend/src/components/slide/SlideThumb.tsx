@@ -8,9 +8,9 @@ interface SlideThumbProps {
 }
 
 export const SlideThumb = memo(({ deck, slide, className }: { deck: any, slide: any, className?: string }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
+  const [width, setWidth] = useState(300);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -24,7 +24,8 @@ export const SlideThumb = memo(({ deck, slide, className }: { deck: any, slide: 
     );
     
     const resizeObserver = new ResizeObserver(([entry]) => {
-      setWidth(entry.contentRect.width);
+      const newWidth = Math.round(entry.contentRect.width);
+      setWidth(prev => Math.abs(prev - newWidth) > 1 ? newWidth : prev);
     });
 
     if (containerRef.current) {
@@ -55,7 +56,7 @@ export const SlideThumb = memo(({ deck, slide, className }: { deck: any, slide: 
             transform: `scale(${scale})`
           }}
         >
-          <SlideRenderer slide={slide} theme={deck.design || deck.theme} />
+          <SlideRenderer slide={slide} theme={deck?.design || deck?.theme || {}} />
         </div>
       )}
     </div>

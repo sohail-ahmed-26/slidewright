@@ -26,6 +26,23 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+import { initAgentPrompts } from './initPrompts';
+
+app.listen(port, async () => {
   console.log(`Backend listening on http://localhost:${port}`);
+  try {
+    await initAgentPrompts();
+    const agents = await prisma.agentConfig.findMany({
+      include: { versions: { orderBy: { createdAt: 'desc' }, take: 1 } }
+    });
+    console.log('=== DB AGENTS CONFIG ===', JSON.stringify(agents.map(a => ({
+      name: a.name,
+      hasCustomPrompt: Boolean(a.customPrompt),
+      promptSnippet: (a.customPrompt || a.versions[0]?.prompt || '').substring(0, 60) + '...'
+    })), null, 2));
+  } catch (err) {
+    console.error('Failed to initialize agent prompts:', err);
+  }
 });
+
+

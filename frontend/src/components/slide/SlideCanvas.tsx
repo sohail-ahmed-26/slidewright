@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
+import { SlideTheme } from './SlideContext';
 
 interface SlideCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
   exportMode?: boolean;
-  theme?: {
-    primary?: string;
-    fontFamily?: string;
-  };
+  layout?: string;
+  theme?: SlideTheme;
 }
 
-export function SlideCanvas({ exportMode, theme, className, children, ...props }: SlideCanvasProps) {
+export function SlideCanvas({ exportMode, layout, theme, className, children, ...props }: SlideCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+
+  const isDarkLayout = ['cover', 'closing', 'big_number_dark'].includes(layout || '');
 
   useEffect(() => {
     if (exportMode) {
@@ -24,7 +25,8 @@ export function SlideCanvas({ exportMode, theme, className, children, ...props }
         const { width, height } = entry.contentRect;
         const scaleX = width / 1280;
         const scaleY = height / 720;
-        setScale(Math.min(scaleX, scaleY));
+        const newScale = Math.min(scaleX, scaleY);
+        setScale(prev => Math.abs(prev - newScale) > 0.001 ? newScale : prev);
       }
     });
 
@@ -40,11 +42,16 @@ export function SlideCanvas({ exportMode, theme, className, children, ...props }
     height: 720,
     transform: `scale(${scale})`,
     transformOrigin: 'center center',
+    backgroundColor: isDarkLayout ? (theme?.darkBg || '#070F26') : (theme?.lightBg || '#FFFFFF'),
+    color: isDarkLayout ? '#FFFFFF' : '#0F172A',
   };
 
   if (theme?.primary) {
     (customStyle as any)['--primary'] = theme.primary;
     (customStyle as any)['--ring'] = theme.primary;
+  }
+  if (theme?.secondary) {
+    (customStyle as any)['--secondary'] = theme.secondary;
   }
   if (theme?.fontFamily) {
     customStyle.fontFamily = theme.fontFamily;
@@ -58,8 +65,10 @@ export function SlideCanvas({ exportMode, theme, className, children, ...props }
     >
       <div 
         className={cn(
-          "bg-white relative shrink-0 text-gray-900",
-          exportMode ? "" : "shadow-xl border border-gray-200",
+          "relative shrink-0 overflow-hidden transition-colors",
+          isDarkLayout ? "text-white" : "text-slate-900",
+          exportMode ? "" : "shadow-2xl rounded-xl border",
+          isDarkLayout ? "border-white/10" : "border-slate-200/80",
           className
         )}
         style={customStyle}

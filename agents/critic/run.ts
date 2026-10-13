@@ -1,16 +1,18 @@
 import { callLLM } from '../llm/openrouter';
-import { criticSystemPrompt } from './prompt';
+import { getCriticSystemPrompt } from './prompt';
 import { CriticLLMOutputSchema, CriticLLMOutput } from '@slidewright/shared';
 import fs from 'fs';
 import path from 'path';
 
 export interface CriticOptions {
   deckId: string;
+  customPrompt?: string;
   mockMode?: boolean;
 }
 
 export async function runCritic(options: CriticOptions): Promise<CriticLLMOutput> {
-  const deckPath = path.resolve(process.cwd(), `outputs/decks/${options.deckId}.json`);
+  const rootDir = process.cwd().endsWith('backend') ? path.join(process.cwd(), '..') : process.cwd();
+  const deckPath = path.resolve(rootDir, `outputs/decks/${options.deckId}.json`);
   if (!fs.existsSync(deckPath)) {
     throw new Error(`Deck not found: ${deckPath}`);
   }
@@ -35,27 +37,29 @@ ${JSON.stringify(deck.slides.map((s: any) => ({
   visuals: s.diagram ? s.diagram : (s.image ? s.image : 'None')
 })), null, 2)}`;
 
+  const systemPrompt = getCriticSystemPrompt(options.customPrompt);
   let jsonStr = '';
   
   if (options.mockMode) {
     jsonStr = JSON.stringify({
-      score: 6,
-      feedback: "The layout is generally good, but some text is too dense.",
-      issues: [
-        {
-          slideId: deck.slides[0]?.id || "s1",
-          type: "content",
-          severity: "medium",
-          message: "Too much text on the first slide.",
-          suggestedFix: "Shorten the body text to bullet points."
-        }
-      ],
-      approved: false
+      score: 85,
+      feedback: "The layout and structure are solid with good pacing and professional themes.",
+      criterionScores: {
+        contentQuality: 18,
+        layoutComposition: 17,
+        visualAssets: 13,
+        typographyReadability: 13,
+        colorDesignConsistency: 8,
+        structureStorytelling: 8,
+        professionalPolish: 8
+      },
+      issues: [],
+      approved: true
     });
   } else {
     jsonStr = await callLLM({
       model: process.env.MODEL_TEXT || 'openai/gpt-4o-mini',
-      systemPrompt: criticSystemPrompt,
+      systemPrompt,
       userPrompt,
       mockMode: false
     });
@@ -63,6 +67,10 @@ ${JSON.stringify(deck.slides.map((s: any) => ({
 
   try {
     const raw = JSON.parse(jsonStr);
+    if (raw.approved === undefined && typeof raw.score === 'number') {
+      const score = raw.score <= 10 ? raw.score * 10 : raw.score;
+      raw.approved = score >= 80 && !(raw.issues || []).some((i: any) => i.severity === 'high');
+    }
     const parsed = CriticLLMOutputSchema.parse(raw);
     return parsed;
   } catch (err: any) {
@@ -70,3 +78,4 @@ ${JSON.stringify(deck.slides.map((s: any) => ({
     throw new Error(`Critic output validation failed: ${err.message}`);
   }
 }
+

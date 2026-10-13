@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useJobStore } from '../store/useJobStore';
+import { useAgentStore } from '../store/useAgentStore';
 import { Button } from '../components/ui/button';
 import { Textarea } from '../components/ui/textarea';
 import { Input } from '../components/ui/input';
@@ -36,26 +37,35 @@ export function NewDeck() {
   const [imagesOn, setImagesOn] = useState(true);
   const [diagramsOn, setDiagramsOn] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!prompt.trim()) return;
     
-    const jobId = createJob({
-      prompt,
-      audience,
-      language,
-      slideCount: slideCount[0],
-      tone,
-      designerOn,
-      designMode,
-      visualsOn,
-      imagesOn,
-      diagramsOn,
-      criticOn,
-      criticRounds: criticRounds[0]
-    }, false); // Simulate failure moved to settings
-    
-    navigate(`/runs/${jobId}`);
+    setIsSubmitting(true);
+    try {
+      const writerPrompt = useAgentStore.getState().agents.writer?.systemPrompt;
+      const jobId = await createJob({
+        prompt,
+        audience,
+        language,
+        slideCount: slideCount[0],
+        tone,
+        writerPrompt,
+        designerOn,
+        designMode,
+        visualsOn,
+        imagesOn,
+        diagramsOn,
+        criticOn,
+        criticRounds: criticRounds[0]
+      }, false);
+      
+      navigate(`/runs/${jobId}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -116,6 +126,8 @@ export function NewDeck() {
                       <SelectItem value="ur" dir="rtl">اردو (Urdu)</SelectItem>
                       <SelectItem value="es">Español (Spanish)</SelectItem>
                       <SelectItem value="ar" dir="rtl">العربية (Arabic)</SelectItem>
+                      <SelectItem value="fr">Français (French)</SelectItem>
+                      <SelectItem value="de">Deutsch (German)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -305,9 +317,9 @@ export function NewDeck() {
             <Button type="button" variant="ghost" onClick={() => navigate('/library')} className="text-muted-foreground hover:text-foreground">
               Cancel
             </Button>
-            <Button type="submit" size="lg" className="px-8 bg-gradient-to-r from-[#3B7BFF] to-[#2459E6] hover:from-[#1F55E0] hover:to-[#1F55E0] shadow-[0_4px_14px_0_rgba(47,107,255,0.39)] hover:shadow-[0_6px_20px_rgba(47,107,255,0.23)] border-none text-white font-medium transition-all" disabled={!prompt.trim()}>
+            <Button type="submit" size="lg" className="px-8 bg-gradient-to-r from-[#3B7BFF] to-[#2459E6] hover:from-[#1F55E0] hover:to-[#1F55E0] shadow-[0_4px_14px_0_rgba(47,107,255,0.39)] hover:shadow-[0_6px_20px_rgba(47,107,255,0.23)] border-none text-white font-medium transition-all" disabled={!prompt.trim() || isSubmitting}>
               <Sparkles className="w-4 h-4 mr-2" />
-              {prompt.trim() ? "Generate Presentation" : "Enter a topic to begin"}
+              {isSubmitting ? "Starting..." : prompt.trim() ? "Generate Presentation" : "Enter a topic to begin"}
             </Button>
           </div>
         </form>

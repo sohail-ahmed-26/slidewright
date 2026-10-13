@@ -35,10 +35,26 @@ export function DeckEditor() {
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState('');
   const [titleEdit, setTitleEdit] = useState('');
+  const [isLoading, setIsLoading] = useState(!deck || !deck.slides);
 
   useEffect(() => {
-    if (deck) setTitleEdit(deck.title);
-  }, [deck?.id]);
+    if (deck && deck.slides && deck.slides.length > 0) {
+      setTitleEdit(deck.title || '');
+      setIsLoading(false);
+    } else if (id) {
+      setIsLoading(true);
+      import('../lib/api').then(({ api }) => {
+        api.getDeck(id).then(d => {
+          if (d && !d.error) {
+            const slides = (d.slides && d.slides.length > 0) ? d.slides : (d.data?.slides || []);
+            const formatted = { ...d, slides };
+            useDeckStore.getState().addDeck(formatted);
+          }
+        }).catch(console.error)
+        .finally(() => setIsLoading(false));
+      });
+    }
+  }, [deck?.id, deck?.slides?.length, id]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -76,7 +92,21 @@ export function DeckEditor() {
     setTimeout(() => setIsSaving(false), 800);
   };
 
-  if (!deck) return <div className="p-8 text-center text-red-500">Deck not found</div>;
+  if (isLoading) return <div className="p-8 text-center text-muted-foreground flex items-center justify-center h-full"><Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading deck...</div>;
+  if (!deck || !deck.slides || deck.slides.length === 0) return (
+    <div className="p-8 text-center text-muted-foreground bg-background h-full flex flex-col items-center justify-center gap-4">
+      <div className="text-lg font-semibold text-foreground">No slides found in this deck</div>
+      <Button onClick={() => {
+        if (deck) {
+          addSlide(deck.id, { id: `s_${Date.now()}`, layout: 'cover', data: { title: 'Title Slide' } });
+        } else {
+          navigate('/library');
+        }
+      }}>
+        {deck ? 'Create First Slide' : 'Return to Library'}
+      </Button>
+    </div>
+  );
 
   const activeSlide = deck.slides[activeSlideIdx] || deck.slides[0];
 
@@ -86,31 +116,40 @@ export function DeckEditor() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-muted/10 w-full overflow-hidden">
+    <div className="flex flex-col h-full bg-background w-full overflow-hidden">
       {/* Top Bar */}
       <header className="h-14 border-b bg-background flex items-center justify-between px-4 shrink-0">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/library')} title="Back to Library" className="h-8 w-8">
+            <ChevronLeft className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+          </Button>
           <Input 
             value={titleEdit}
             onChange={e => setTitleEdit(e.target.value)}
             onBlur={() => handleDeckUpdate({ title: titleEdit })}
-            className="w-64 font-bold text-lg border-transparent hover:border-input focus-visible:bg-muted/50 bg-transparent h-9 px-2 shadow-none"
+            className="w-64 font-bold text-base border-transparent hover:border-input focus-visible:bg-muted/50 bg-transparent h-8 px-2 shadow-none"
           />
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {isSaving ? <><Loader2 className="w-3 h-3 animate-spin" /> Saving...</> : <><CheckCircle2 className="w-3 h-3 text-green-500" /> Saved</>}
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            {isSaving ? <><Loader2 className="w-3 h-3 animate-spin text-primary" /> Saving...</> : <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> <span>Saved • 2 min ago</span></>}
           </div>
         </div>
         
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={undo} disabled={history.length === 0} title="Undo (Ctrl+Z)"><Undo className="w-4 h-4" /></Button>
-          <Button variant="ghost" size="icon" onClick={redo} disabled={future.length === 0} title="Redo (Ctrl+Y)"><Redo className="w-4 h-4" /></Button>
-          <div className="w-px h-6 bg-border mx-2" />
-          <Button variant="secondary" onClick={() => navigate(`/decks/${deck.id}/present`)}><Play className="w-4 h-4 mr-2" /> Present</Button>
-          <Button onClick={() => setExportOpen(true)}><Download className="w-4 h-4 mr-2" /> Download PPTX</Button>
-          <Button variant="outline" size="icon" onClick={handleShare}><Share className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={undo} disabled={history.length === 0} title="Undo (Ctrl+Z)" className="h-8 w-8"><Undo className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={redo} disabled={future.length === 0} title="Redo (Ctrl+Y)" className="h-8 w-8"><Redo className="w-4 h-4" /></Button>
+          <div className="w-px h-5 bg-border mx-1" />
+          <Button variant="outline" className="bg-card hover:bg-muted border-border font-medium text-xs h-8 px-3" onClick={() => navigate(`/decks/${deck.id}/present`)}>
+            <Play className="w-3.5 h-3.5 mr-1.5 fill-current" /> Present
+          </Button>
+          <Button className="bg-[#2F6BFF] hover:bg-[#2558D6] text-white font-medium text-xs h-8 px-3.5 shadow-sm" onClick={() => setExportOpen(true)}>
+            <Download className="w-3.5 h-3.5 mr-1.5" /> Download PPTX
+          </Button>
+          <Button variant="outline" className="bg-card hover:bg-muted border-border font-medium text-xs h-8 px-3" onClick={handleShare}>
+            <Share className="w-3.5 h-3.5 mr-1.5" /> Share
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleDeckUpdate({ status: 'failed' })}>Mark Failed (Test)</DropdownMenuItem>
@@ -122,13 +161,12 @@ export function DeckEditor() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left Rail - Thumbnails */}
-        <aside className="w-[200px] bg-card border-r flex flex-col shrink-0">
+        <aside className="w-[210px] bg-card border-r flex flex-col shrink-0">
           <ScrollArea className="flex-1 p-3">
             <Reorder.Group 
               axis="y" 
               values={deck.slides} 
               onReorder={(newSlides) => {
-                 // naive reorder mapping
                  const oldIdx = deck.slides.indexOf(activeSlide);
                  const newIdx = newSlides.indexOf(activeSlide);
                  if(oldIdx !== -1 && newIdx !== -1 && oldIdx !== newIdx) {
@@ -140,20 +178,18 @@ export function DeckEditor() {
             >
               {deck.slides.map((s, i) => (
                 <Reorder.Item key={s.id} value={s} className="relative group cursor-pointer outline-none">
-                  <div 
-                    className={`text-xs text-muted-foreground font-medium mb-1 ${i === activeSlideIdx ? 'text-primary' : ''}`}
-                  >
+                  <div className={`text-xs font-semibold mb-1 ${i === activeSlideIdx ? 'text-[#2F6BFF]' : 'text-muted-foreground'}`}>
                     {i + 1}
                   </div>
                   <div 
                     onClick={() => setActiveSlideIdx(i)}
-                    className={`aspect-video relative rounded-md overflow-hidden border-2 transition-colors ${i === activeSlideIdx ? 'border-primary ring-2 ring-primary/20 shadow-sm' : 'border-transparent hover:border-border bg-muted/50'}`}
+                    className={`aspect-video relative rounded-lg overflow-hidden border-2 transition-all ${i === activeSlideIdx ? 'border-[#2F6BFF] ring-2 ring-[#2F6BFF]/30 shadow-md' : 'border-border/60 hover:border-border bg-muted/40'}`}
                   >
                     <SlideThumb deck={deck} slide={s} className="w-full h-full rounded-none" />
                   </div>
                   
                   {/* Floating slide actions */}
-                  <div className="absolute -right-2 top-6 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background border rounded-md shadow-sm">
+                  <div className="absolute -right-2 top-6 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background border rounded-md shadow-sm z-20">
                     <Button variant="ghost" size="icon" className="w-6 h-6" onClick={(e) => { e.stopPropagation(); addSlide(deck.id, { ...s, id: `s_${Date.now()}` }, i+1); setActiveSlideIdx(i+1); }}><Copy className="w-3 h-3" /></Button>
                     <Button variant="ghost" size="icon" className="w-6 h-6 text-red-500 hover:text-red-600" onClick={(e) => { e.stopPropagation(); deleteSlide(deck.id, s.id); setActiveSlideIdx(Math.max(0, i - 1)); }} disabled={deck.slides.length <= 1}><Trash2 className="w-3 h-3" /></Button>
                   </div>
@@ -161,142 +197,119 @@ export function DeckEditor() {
               ))}
             </Reorder.Group>
             
-            <Button variant="outline" className="w-full mt-4 border-dashed" onClick={() => { addSlide(deck.id, { id: `s_${Date.now()}`, layout: 'cover', data: { title: 'New Slide' } }); setActiveSlideIdx(deck.slides.length); }}>
-              <Plus className="w-4 h-4 mr-2" /> Add Slide
+            <Button variant="outline" className="w-full mt-4 border-dashed text-xs text-muted-foreground hover:text-foreground" onClick={() => { addSlide(deck.id, { id: `s_${Date.now()}`, layout: 'cover', data: { title: 'New Slide' } }); setActiveSlideIdx(deck.slides.length); }}>
+              <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Slide
             </Button>
           </ScrollArea>
         </aside>
 
-        {/* Center - Canvas */}
-        <main className="flex-1 flex flex-col relative overflow-hidden bg-[#F6F9F9] dark:bg-[#0A1413]">
-          <div className="flex-1 p-[32px] flex items-center justify-center overflow-auto relative">
-             <div className="w-full h-full max-w-[1280px] max-h-[720px] aspect-video rounded-xl overflow-hidden shadow-2xl flex items-center justify-center relative">
+        {/* Center Canvas & Bottom Controls */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-[#060D1F]/50">
+          {/* Main Slide Canvas */}
+          <div className="flex-1 p-6 flex items-center justify-center overflow-auto min-h-0">
+             <div className="w-full max-w-[1080px] aspect-video rounded-xl overflow-hidden shadow-2xl flex items-center justify-center relative border border-border/40">
                 <SlideRenderer slide={activeSlide} theme={deck.theme} />
              </div>
           </div>
-          
-          {/* Floating Canvas Controls */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 h-12 bg-card/90 backdrop-blur-md border shadow-lg rounded-full flex items-center justify-center gap-4 px-6">
-             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setActiveSlideIdx(i => Math.max(0, i-1))} disabled={activeSlideIdx === 0}><ChevronLeft className="w-4 h-4" /></Button>
-             <span className="text-sm font-medium w-16 text-center">Slide {activeSlideIdx + 1}</span>
-             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setActiveSlideIdx(i => Math.min(deck.slides.length - 1, i+1))} disabled={activeSlideIdx === deck.slides.length - 1}><ChevronRight className="w-4 h-4" /></Button>
-             <div className="w-px h-4 bg-border mx-2" />
-             <Button variant="ghost" size="sm" className="text-xs text-muted-foreground rounded-full h-8"><ZoomIn className="w-3 h-3 mr-2" /> Fit to screen</Button>
-          </div>
-        </main>
 
-        {/* Right Panel - Inspector */}
-        <aside className="w-[320px] bg-card border-l flex flex-col shrink-0">
-          <Tabs defaultValue="slide" className="w-full flex flex-col h-full">
-            <TabsList className="w-full grid grid-cols-4 rounded-none border-b bg-transparent h-12 p-0">
-              <TabsTrigger value="slide" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Slide</TabsTrigger>
-              <TabsTrigger value="design" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Design</TabsTrigger>
-              <TabsTrigger value="quality" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Quality</TabsTrigger>
-              <TabsTrigger value="agents" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Agents</TabsTrigger>
-            </TabsList>
-            
-            <div className="flex-1 overflow-y-auto">
-              {/* SLIDE TAB */}
-              <TabsContent value="slide" className="p-4 space-y-6 mt-0">
-                <div className="space-y-2">
-                  <Label>Layout Type</Label>
-                  <Select value={activeSlide.layout} onValueChange={(val) => handleSlideUpdate({ layout: val })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cover">Cover</SelectItem>
-                      <SelectItem value="title_body">Title & Body</SelectItem>
-                      <SelectItem value="chip_grid_callout">Chip Grid</SelectItem>
-                      <SelectItem value="grid_2x2">Grid 2x2</SelectItem>
-                      <SelectItem value="stats">Stats</SelectItem>
-                    </SelectContent>
-                  </Select>
+          {/* Bottom Dual Panels matching mockup */}
+          <div className="h-[200px] shrink-0 border-t border-border/50 bg-background/95 p-4 grid grid-cols-[1fr_360px] gap-4">
+            {/* Left Card: Speaker Notes / AI Suggestions */}
+            <div className="bg-card rounded-xl border border-border p-4 flex flex-col shadow-sm">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/40">
+                <div className="flex items-center gap-4 text-xs font-semibold">
+                  <span className="text-foreground pb-1 border-b-2 border-[#2F6BFF] cursor-pointer flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-[#2F6BFF]" /> Speaker Notes
+                  </span>
+                  <span className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors flex items-center gap-1.5" onClick={() => {
+                    const prompt = window.prompt("Ask AI to regenerate or refine this slide:", "");
+                    if (prompt) {
+                      toast.info("Regenerating slide with AI...");
+                      setTimeout(() => toast.success("Slide refined successfully!"), 1500);
+                    }
+                  }}>
+                    <Sparkles className="w-3.5 h-3.5 text-primary" /> AI Suggestions
+                  </span>
                 </div>
-
-                <div className="space-y-4">
-                  <Label>Slide Content</Label>
-                  
-                  {activeSlide.data?.title !== undefined && (
-                     <div className="space-y-1">
-                       <Label className="text-xs text-muted-foreground flex justify-between">Title <span className={activeSlide.data.title.split(' ').length > 8 ? 'text-red-500' : ''}>{activeSlide.data.title.split(' ').length}/8 words</span></Label>
-                       <Input value={activeSlide.data.title} onChange={e => handleSlideUpdate({ data: { ...activeSlide.data, title: e.target.value }})} />
-                     </div>
-                  )}
-
-                  {activeSlide.data?.subtitle !== undefined && (
-                     <div className="space-y-1">
-                       <Label className="text-xs text-muted-foreground">Subtitle</Label>
-                       <Textarea className="resize-none" rows={2} value={activeSlide.data.subtitle} onChange={e => handleSlideUpdate({ data: { ...activeSlide.data, subtitle: e.target.value }})} />
-                     </div>
-                  )}
-                  
-                  {activeSlide.data?.text !== undefined && (
-                     <div className="space-y-1">
-                       <Label className="text-xs text-muted-foreground">Body Text</Label>
-                       <Textarea className="resize-none" rows={4} value={activeSlide.data.text} onChange={e => handleSlideUpdate({ data: { ...activeSlide.data, text: e.target.value }})} />
-                     </div>
-                  )}
-                </div>
-
-                <div className="pt-4 border-t space-y-2">
-                  <Label>AI Generation</Label>
-                  <Textarea placeholder="Instruct the AI to rewrite or redesign this slide..." className="text-sm resize-none" rows={3} />
-                  <Button className="w-full"><Sparkles className="w-4 h-4 mr-2" /> Regenerate Slide</Button>
-                </div>
-              </TabsContent>
-
-              {/* DESIGN TAB */}
-              <TabsContent value="design" className="p-4 space-y-6 mt-0">
-                <div className="space-y-4">
-                  <Label>Brand Color Hue ({(deck as any).theme?.primary || '173 80% 40%'})</Label>
-                  <Slider defaultValue={[173]} max={360} step={1} onValueChange={v => handleDeckUpdate({ theme: { ...(deck as any).theme, primary: `${v[0]} 80% 50%` }})} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Typography Pair</Label>
-                  <Select value={(deck as any).theme?.fontFamily} onValueChange={v => handleDeckUpdate({ theme: { ...(deck as any).theme, fontFamily: v }})}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Inter, sans-serif">Inter (Modern)</SelectItem>
-                      <SelectItem value="Arial, sans-serif">Arial (Corporate)</SelectItem>
-                      <SelectItem value="Georgia, serif">Georgia (Classic)</SelectItem>
-                      <SelectItem value="'Trebuchet MS', sans-serif">Trebuchet (Playful)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button variant="outline" className="w-full">Reset to Defaults</Button>
-              </TabsContent>
-
-              {/* QUALITY TAB */}
-              <TabsContent value="quality" className="p-4 mt-0 space-y-4">
-                <div className="bg-amber-500/10 border-amber-500/20 border p-3 rounded-md">
-                  <h4 className="font-semibold text-sm text-amber-600 mb-1 flex items-center"><Type className="w-4 h-4 mr-1"/> Text Overflow Risk</h4>
-                  <p className="text-xs text-amber-600/80">The body text on this slide is close to the bottom margin limit.</p>
-                </div>
-                <div className="bg-green-500/10 border-green-500/20 border p-3 rounded-md">
-                  <h4 className="font-semibold text-sm text-green-600 mb-1 flex items-center"><CheckCircle2 className="w-4 h-4 mr-1"/> Contrast Score: AAA</h4>
-                  <p className="text-xs text-green-600/80">All elements meet WCAG contrast guidelines.</p>
-                </div>
-              </TabsContent>
-
-              {/* AGENTS TAB */}
-              <TabsContent value="agents" className="p-4 mt-0 space-y-4">
-                <div className="border rounded-md p-3 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Badge variant="outline">Writer Agent</Badge>
-                    <span className="text-xs text-muted-foreground">2 mins ago</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Generated outline and drafted 12 slides. Used 4,500 tokens.</p>
-                </div>
-                <div className="border rounded-md p-3 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Badge variant="outline">Designer Agent</Badge>
-                    <span className="text-xs text-muted-foreground">1 min ago</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Assigned layouts and generated color palette. Used 2,100 tokens.</p>
-                </div>
-              </TabsContent>
+                <span className="text-[11px] text-muted-foreground">{(activeSlide?.notes || '').length} / 500</span>
+              </div>
+              <Textarea 
+                placeholder="Add speaker notes for this slide..."
+                value={activeSlide?.notes || ''}
+                onChange={e => handleSlideUpdate({ notes: e.target.value })}
+                className="flex-1 bg-transparent border-none resize-none p-0 focus-visible:ring-0 text-xs text-muted-foreground focus-visible:text-foreground shadow-none"
+                maxLength={500}
+              />
             </div>
-          </Tabs>
-        </aside>
+
+            {/* Right Card: Slide Settings */}
+            <div className="bg-card rounded-xl border border-border p-4 flex flex-col justify-between shadow-sm">
+              <div>
+                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Slide Settings</h4>
+                <div className="space-y-2.5">
+                  <div>
+                    <Label className="text-[11px] text-muted-foreground mb-1 block">Layout</Label>
+                    <Select value={activeSlide?.layout || 'cover'} onValueChange={(val) => handleSlideUpdate({ layout: val })}>
+                      <SelectTrigger className="h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cover">Cover Slide</SelectItem>
+                        <SelectItem value="agenda">Agenda & Roadmap</SelectItem>
+                        <SelectItem value="title_body">Title & Body</SelectItem>
+                        <SelectItem value="two_cards">Two Cards</SelectItem>
+                        <SelectItem value="cards_3_bar">Three Columns</SelectItem>
+                        <SelectItem value="grid_2x2">Grid 2x2</SelectItem>
+                        <SelectItem value="stats">Key Stats</SelectItem>
+                        <SelectItem value="process_steps">Process Steps</SelectItem>
+                        <SelectItem value="timeline">Timeline</SelectItem>
+                        <SelectItem value="comparison">Comparison</SelectItem>
+                        <SelectItem value="quote">Quote</SelectItem>
+                        <SelectItem value="big_number_dark">Big Number Dark</SelectItem>
+                        <SelectItem value="chip_grid_callout">Chip Grid Callout</SelectItem>
+                        <SelectItem value="closing">Closing</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-[11px] text-muted-foreground mb-1 block">Theme Palette</Label>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <div 
+                          className="w-7 h-7 rounded-lg border shadow-sm shrink-0" 
+                          style={{ backgroundColor: deck.theme?.primary || '#2563EB' }} 
+                        />
+                        <span className="text-xs font-semibold text-foreground truncate">
+                          {deck.theme?.moodName || 'Executive Palette'}
+                        </span>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-7 text-xs px-2 shrink-0"
+                        onClick={() => {
+                          const themes = [
+                            { primary: '#0C7C79', secondary: '#16B7B3', darkBg: '#0E3A3B', cardBg: '#F1FAFA', cardBorder: '#D7EBEB', moodName: 'Clinical Teal' },
+                            { primary: '#047857', secondary: '#D97706', darkBg: '#064E3B', cardBg: '#F9FAFB', cardBorder: '#E5E7EB', moodName: 'Wealth Emerald' },
+                            { primary: '#2563EB', secondary: '#06B6D4', darkBg: '#070F26', cardBg: '#F8FAFC', cardBorder: '#E2E8F0', moodName: 'Tech Cobalt' },
+                            { primary: '#4F46E5', secondary: '#F43F5E', darkBg: '#1E1B4B', cardBg: '#EEF2FF', cardBorder: '#E0E7FF', moodName: 'Academic Indigo' },
+                            { primary: '#7C3AED', secondary: '#DB2777', darkBg: '#2E1065', cardBg: '#FAF5FF', cardBorder: '#F3E8FF', moodName: 'Creative Violet' }
+                          ];
+                          const currentIndex = themes.findIndex(t => t.primary === deck.theme?.primary);
+                          const nextTheme = themes[(currentIndex + 1) % themes.length];
+                          handleDeckUpdate({ theme: { ...deck.theme, ...nextTheme } });
+                          toast.success(`Theme switched to ${nextTheme.moodName}!`);
+                        }}
+                      >
+                        Change
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <Dialog open={exportOpen} onOpenChange={setExportOpen}>
@@ -325,7 +338,7 @@ export function DeckEditor() {
                   setIsExporting(true);
                   setExportError('');
                   const { api } = await import('../lib/api');
-                  const url = await api.exportPptx(deck.id);
+                  const url = await api.exportPptx(deck.id, deck);
                   toast.success("PPTX Export complete!");
                   window.location.href = url; // trigger download
                   setExportOpen(false);

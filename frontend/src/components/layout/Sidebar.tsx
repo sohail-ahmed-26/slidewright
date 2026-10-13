@@ -34,7 +34,7 @@ export function Sidebar() {
 
       <nav className="flex-1 overflow-y-auto py-6 flex flex-col gap-2 px-4">
         <Button 
-          className={cn("justify-start gap-2 mb-4", !sidebarOpen && "justify-center px-0")}
+          className={cn("justify-start gap-2 mb-4 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md", !sidebarOpen && "justify-center px-0")}
           onClick={() => navigate('/new')}
         >
           <Plus className="h-4 w-4 shrink-0" />
@@ -56,8 +56,8 @@ export function Sidebar() {
                   key={deck.id}
                   to={`/decks/${deck.id}`}
                   className={({ isActive }) => cn(
-                    "flex items-center gap-3 px-2 py-2 text-sm rounded-lg truncate transition-colors",
-                    isActive ? "text-primary font-medium bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    "flex items-center gap-3 px-3 py-2 text-sm rounded-lg truncate transition-colors",
+                    isActive ? "text-white font-medium bg-white/10" : "text-muted-foreground hover:bg-white/5 hover:text-white"
                   )}
                 >
                   <FileText className="h-4 w-4 shrink-0 opacity-70" />
@@ -95,7 +95,7 @@ function NavItem({ to, icon, label, open }: { to: string, icon: React.ReactNode,
       to={to}
       className={({ isActive }) => cn(
         "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium",
-        isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+        isActive ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:bg-white/5 hover:text-white",
         !open && "justify-center px-0"
       )}
       title={!open ? label : undefined}

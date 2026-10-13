@@ -84,20 +84,20 @@ export async function exportDeckToPptx(deckId: string): Promise<string> {
       const imgX = isRight ? 13.333 / 2 : 0;
       slide.addText(sd.title || '', { x: textX, y: 2.0, w: contentWidth / 2 - 0.5, h: 1.0, fontSize: 36, bold: true, color: primaryHex, fontFace });
       slide.addText(sd.text || '', { x: textX, y: 3.5, w: contentWidth / 2 - 0.5, h: 3.0, fontSize: 20, color: textColor, fontFace });
-      slide.addShape(pres.ShapeType.rect, { x: imgX, y: 0, w: 13.333 / 2, h: 7.5, fill: { color: 'EAEAEA' } });
+      slide.addShape('rect', { x: imgX, y: 0, w: 13.333 / 2, h: 7.5, fill: { color: 'EAEAEA' } });
       slide.addText('IMAGE PLACEHOLDER', { x: imgX, y: 3.5, w: 13.333 / 2, h: 0.5, align: 'center', color: '999999' });
     } else if (s.layout === 'chip_grid_callout') {
       slide.addText(sd.title || '', { x: marginX, y: 0.5, w: contentWidth, h: 1.0, fontSize: 32, bold: true, color: primaryHex, fontFace });
       let cx = marginX;
       let cy = 2.0;
       (sd.chips || []).forEach((chip: string) => {
-        slide.addShape(pres.ShapeType.rect, { x: cx, y: cy, w: 2, h: 0.8, fill: { color: 'F5F5F5' }, line: { color: primaryHex, width: 1 }, shadow: shadowObj });
+        slide.addShape('rect', { x: cx, y: cy, w: 2, h: 0.8, fill: { color: 'F5F5F5' }, line: { color: primaryHex, width: 1 }, shadow: shadowObj });
         slide.addText(chip, { x: cx, y: cy, w: 2, h: 0.8, fontSize: 16, color: textColor, fontFace, align: 'center', isTextBox: true, margin: 0 });
         cx += 2.2;
         if (cx > 8) { cx = marginX; cy += 1.0; }
       });
       if (sd.callout) {
-        slide.addShape(pres.ShapeType.rect, { x: 9.0, y: 2.0, w: 3.5, h: 3.0, fill: { color: primaryHex, transparency: 90 }, shadow: shadowObj });
+        slide.addShape('rect', { x: 9.0, y: 2.0, w: 3.5, h: 3.0, fill: { color: primaryHex, transparency: 90 }, shadow: shadowObj });
         slide.addText(sd.callout.title, { x: 9.2, y: 2.2, w: 3.1, h: 0.5, fontSize: 20, bold: true, color: primaryHex, fontFace, isTextBox: true, margin: 0 });
         slide.addText(sd.callout.body, { x: 9.2, y: 2.7, w: 3.1, h: 2.0, fontSize: 16, color: textColor, fontFace, isTextBox: true, margin: 0 });
       }

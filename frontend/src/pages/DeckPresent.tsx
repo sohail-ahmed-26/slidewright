@@ -68,7 +68,7 @@ export function DeckPresent() {
   if (!deck || !deck.slides) return <div className="p-8 text-center text-red-500">Deck not found or no slides.</div>;
 
   const slide = deck.slides[currentSlideIndex];
-  const progress = ((currentSlideIndex + 1) / deck.slides.length) * 100;
+  const progress = ((currentSlideIndex + 1) / (deck.slides?.length || 1)) * 100;
 
   return (
     <div 
@@ -132,12 +132,12 @@ export function DeckPresent() {
 
         {/* Controls */}
         <div className="flex items-center gap-2 bg-gray-900/90 backdrop-blur-md border border-gray-700 text-white px-6 py-2 rounded-full mt-2 shadow-2xl">
-          <span className="text-sm font-medium mr-4 w-16 text-center font-mono text-gray-300">{currentSlideIndex + 1} / {deck.slides.length}</span>
+          <span className="text-sm font-medium mr-4 w-16 text-center font-mono text-gray-300">{currentSlideIndex + 1} / {deck.slides?.length || 0}</span>
           
           <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20" onClick={() => setCurrentSlideIndex(i => Math.max(i - 1, 0))}>
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20" onClick={() => setCurrentSlideIndex(i => Math.min(i + 1, deck.slides.length - 1))}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20" onClick={() => setCurrentSlideIndex(i => Math.min(i + 1, (deck.slides?.length || 1) - 1))}>
             <ChevronRight className="w-5 h-5" />
           </Button>
           

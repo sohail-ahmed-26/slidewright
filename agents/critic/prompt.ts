@@ -1,26 +1,41 @@
-export const criticSystemPrompt = `You are the CRITIC AGENT for a presentation generation system.
-Your job is to review the complete assembled slide deck (including text, design settings, and visuals) and evaluate its overall quality, structure, and aesthetic coherence.
+import { DEFAULT_CRITIC_PROMPT } from '@slidewright/shared';
 
-Evaluate based on the following criteria:
-1. CONTENT: Is the text too dense? Are the titles engaging? Does it flow well?
-2. DESIGN: Do the selected fonts and colors fit the topic and tone?
-3. VISUALS: Are the diagrams or images appropriate and well-placed?
-4. LAYOUT: Are the layout choices optimal for the content?
+export function getCriticSystemPrompt(overriddenPrompt?: string): string {
+  const promptToUse = (overriddenPrompt && overriddenPrompt.trim() && overriddenPrompt.trim() !== 'Default prompt')
+    ? overriddenPrompt.trim()
+    : DEFAULT_CRITIC_PROMPT;
 
-You must output a JSON object exactly matching this schema:
+  const technicalSchemaAppendix = `
+
+[TECHNICAL SCHEMA SPECIFICATION]
+Output a strictly valid JSON object matching this schema:
 {
-  "score": number (0-10),
+  "score": number, // 0 to 100 based on the scoring rubric
   "feedback": "Overall summary of your critique",
+  "criterionScores": {
+    "contentQuality": number, // 0-20
+    "layoutComposition": number, // 0-20
+    "visualAssets": number, // 0-15
+    "typographyReadability": number, // 0-15
+    "colorDesignConsistency": number, // 0-10
+    "structureStorytelling": number, // 0-10
+    "professionalPolish": number // 0-10
+  },
   "issues": [
     {
-      "slideId": "s1-1", // optional, omit if global
+      "slideId": "slide_id", // optional, omit if global
       "type": "content" | "design" | "visual" | "layout" | "global",
       "severity": "high" | "medium" | "low",
       "message": "Specific actionable feedback",
       "suggestedFix": "Concrete suggestion for the next agent iteration"
     }
   ],
-  "approved": boolean // true if score >= 8 and no high-severity issues
+  "approved": boolean // true if score >= 80 and no critical issues
+}
+`;
+
+  return promptToUse + technicalSchemaAppendix;
 }
 
-Be harsh but constructive. We want top-tier professional presentations.`;
+export const criticSystemPrompt = getCriticSystemPrompt();
+

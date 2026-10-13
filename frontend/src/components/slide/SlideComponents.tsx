@@ -2,70 +2,162 @@ import React from 'react';
 import { cn } from '../../lib/utils';
 import * as Icons from 'lucide-react';
 import { AnimCountUp } from './SlideAnimations';
+import { useSlideContext } from './SlideContext';
 
 export function TitleWithAccent({ title, accentText, className }: { title: string, accentText?: string, className?: string }) {
+  const { theme, isDark } = useSlideContext();
+  const primaryColor = theme?.primary || '#2563EB';
+
+  let mainTitle = title || '';
+  let highlighted = accentText;
+
+  // If accentText is not provided, split the title and accent the last 1-2 words (matching reference.pptx style)
+  if (!highlighted && mainTitle && mainTitle.includes(' ')) {
+    const words = mainTitle.trim().split(/\s+/);
+    if (words.length >= 3) {
+      const accentCount = words.length >= 5 ? 2 : 1;
+      highlighted = words.slice(-accentCount).join(' ');
+      mainTitle = words.slice(0, -accentCount).join(' ') + ' ';
+    }
+  }
+
   return (
-    <h1 className={cn("text-[48px] font-bold tracking-tight leading-tight", className)} data-pptx="text">
-      {title} {accentText && <span className="text-primary">{accentText}</span>}
+    <h1 
+      className={cn(
+        "text-[44px] font-bold tracking-tight leading-tight",
+        isDark ? "text-white" : "text-slate-900",
+        className
+      )} 
+      data-pptx="text"
+    >
+      {mainTitle}
+      {highlighted && (
+        <span style={{ color: primaryColor }}>
+          {highlighted}
+        </span>
+      )}
     </h1>
   );
 }
 
-export function TintCard({ children, className }: { children: React.ReactNode, className?: string }) {
+export function TintCard({ children, className, style }: { children: React.ReactNode, className?: string, style?: React.CSSProperties }) {
+  const { theme, isDark } = useSlideContext();
+  
+  const bg = isDark ? 'rgba(255, 255, 255, 0.05)' : (theme?.cardBg || '#F8FAFC');
+  const border = isDark ? 'rgba(255, 255, 255, 0.12)' : (theme?.cardBorder || '#E2E8F0');
+  const textColor = isDark ? '#F8FAFC' : '#1E293B';
+
   return (
-    <div className={cn("bg-muted/50 rounded-[16px] p-8 border border-border/50 shadow-sm flex flex-col", className)} data-pptx="rect">
+    <div 
+      className={cn(
+        "rounded-[18px] p-8 border shadow-sm flex flex-col transition-all",
+        className
+      )} 
+      style={{
+        backgroundColor: bg,
+        borderColor: border,
+        color: textColor,
+        ...style
+      }}
+      data-pptx="rect"
+    >
       {children}
     </div>
   );
 }
 
 export function DarkCard({ children, className }: { children: React.ReactNode, className?: string }) {
+  const { theme } = useSlideContext();
   return (
-    <div className={cn("bg-gray-900 text-white rounded-[16px] p-8 flex flex-col shadow-lg", className)} data-pptx="rect">
+    <div 
+      className={cn("text-white rounded-[18px] p-8 flex flex-col shadow-xl border border-white/10", className)} 
+      style={{ backgroundColor: theme?.darkBg || '#0F172A' }}
+      data-pptx="rect"
+    >
       {children}
     </div>
   );
 }
 
-export function IconBadge({ icon, className }: { icon: string, className?: string }) {
-  const IconComp = (Icons as any)[icon] || Icons.CheckCircle;
+export function IconBadge({ icon, className }: { icon?: string, className?: string }) {
+  const { theme, isDark } = useSlideContext();
+  const IconComp = (Icons as any)[icon || ''] || Icons.CheckCircle;
+  const primaryColor = theme?.primary || '#2563EB';
+
   return (
-    <div className={cn("inline-flex items-center justify-center bg-primary/10 text-primary p-4 rounded-full", className)} data-pptx="rect">
+    <div 
+      className={cn("inline-flex items-center justify-center p-4 rounded-xl shadow-sm shrink-0", className)} 
+      style={{
+        backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(37,99,235,0.08)',
+        color: primaryColor
+      }}
+      data-pptx="rect"
+    >
       <IconComp className="w-8 h-8" data-pptx="icon" />
     </div>
   );
 }
 
 export function ChipTag({ children, className }: { children: React.ReactNode, className?: string }) {
+  const { theme } = useSlideContext();
   return (
-    <span className={cn("inline-flex items-center px-4 py-2 rounded-full bg-accent text-accent-foreground text-[16px] font-medium border", className)} data-pptx="rect">
+    <span 
+      className={cn("inline-flex items-center px-4 py-2 rounded-full text-[15px] font-semibold border shadow-sm", className)}
+      style={{
+        backgroundColor: theme?.cardBg || '#F1FAFA',
+        borderColor: theme?.cardBorder || '#D7EBEB',
+        color: theme?.primary || '#0C7C79'
+      }}
+      data-pptx="rect"
+    >
       {children}
     </span>
   );
 }
 
 export function BigNumber({ number, label, className }: { number: string, label: string, className?: string }) {
+  const { theme, isDark } = useSlideContext();
+  const primaryColor = theme?.primary || '#2563EB';
+
   return (
     <div className={cn("flex flex-col items-center justify-center", className)} data-pptx="rect">
-      <AnimCountUp value={number} className="text-[120px] font-bold text-primary" />
-      <div className="text-[21px] font-medium text-muted-foreground mt-2" data-pptx="text">{label}</div>
+      <AnimCountUp value={number} className="text-[110px] font-extrabold leading-none tracking-tight" style={{ color: primaryColor }} />
+      <div 
+        className={cn("text-[20px] font-semibold mt-4 text-center", isDark ? "text-slate-300" : "text-slate-600")} 
+        data-pptx="text"
+      >
+        {label}
+      </div>
     </div>
   );
 }
 
 export function KeyMessageBar({ message, className }: { message: string, className?: string }) {
+  const { theme } = useSlideContext();
   return (
-    <div className={cn("w-full bg-primary text-primary-foreground p-4 flex items-center justify-center font-medium text-[21px]", className)} data-pptx="rect">
+    <div 
+      className={cn("w-full text-white p-5 rounded-2xl flex items-center justify-center font-bold text-[20px] shadow-lg", className)} 
+      style={{ backgroundColor: theme?.darkBg || theme?.primary || '#0C7C79' }}
+      data-pptx="rect"
+    >
       <span data-pptx="text">{message}</span>
     </div>
   );
 }
 
-export function FooterBar({ orgName, pageNumber, className }: { orgName: string, pageNumber: number, className?: string }) {
+export function FooterBar({ orgName, pageNumber, className }: { orgName?: string, pageNumber?: number, className?: string }) {
+  const { isDark } = useSlideContext();
   return (
-    <div className={cn("absolute bottom-[58px] left-[58px] right-[58px] flex justify-between items-center text-[16px] text-gray-400", className)} data-pptx="rect">
-      <span data-pptx="text">{orgName}</span>
-      <span data-pptx="text">{pageNumber}</span>
+    <div 
+      className={cn(
+        "absolute bottom-[44px] left-[58px] right-[58px] flex justify-between items-center text-[15px] font-medium pt-3 border-t",
+        isDark ? "text-slate-400 border-white/10" : "text-slate-500 border-slate-200/80",
+        className
+      )} 
+      data-pptx="rect"
+    >
+      <span data-pptx="text">{orgName || 'Executive Presentation'}</span>
+      <span data-pptx="text">{pageNumber || 1}</span>
     </div>
   );
 }

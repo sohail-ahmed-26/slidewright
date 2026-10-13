@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAgentStore } from '../store/useAgentStore';
+import { api } from '../lib/api';
+import { toast } from 'sonner';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -11,11 +13,33 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
-import { ScrollArea } from '../components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { Bot, FileCode, CheckCircle2, XCircle, Terminal, Play, Save, History, RotateCcw, ArrowRight } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '../components/ui/alert-dialog';
+import {
+  Bot,
+  FileCode,
+  CheckCircle2,
+  XCircle,
+  Terminal,
+  Play,
+  Save,
+  RotateCcw,
+  ArrowRight,
+  Loader2,
+  AlertTriangle
+} from 'lucide-react';
 
 const MODELS = [
+  { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini (Default)', structured: true, vision: true, image: false },
   { id: 'gpt-4o', name: 'GPT-4o', structured: true, vision: true, image: false },
   { id: 'claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', structured: true, vision: true, image: false },
   { id: 'dall-e-3', name: 'DALL-E 3', structured: false, vision: false, image: true },
@@ -26,7 +50,8 @@ const MODELS = [
 export function AgentConfig() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
-  const agent = useAgentStore(s => s.agents[name || '']);
+  const agentKey = (name === 'visual' ? 'visuals' : name) || '';
+  const agent = useAgentStore(s => s.agents[agentKey]);
   const updateAgent = useAgentStore(s => s.updateAgent);
   const resetPrompt = useAgentStore(s => s.resetPrompt);
 
@@ -34,24 +59,76 @@ export function AgentConfig() {
   const [localAgent, setLocalAgent] = useState(agent);
   const [playgroundInput, setPlaygroundInput] = useState('{\n  "test": "sample input"\n}');
   const [playgroundOutput, setPlaygroundOutput] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  useEffect(() => {
+    if (agent) {
+      setLocalAgent(agent);
+    }
+    if (agentKey) {
+      api.getAgentPrompt(agentKey).then(savedPrompt => {
+        if (savedPrompt && savedPrompt.trim()) {
+          setLocalAgent(prev => prev ? { ...prev, systemPrompt: savedPrompt } : prev);
+        }
+      }).catch(console.error);
+    }
+  }, [agentKey]);
 
   if (!agent || !localAgent) {
-    return <div className="p-8 text-center text-red-500">Agent not found</div>;
+    return (
+      <div className="p-12 text-center">
+        <h2 className="text-xl font-semibold text-destructive mb-2">Agent Not Found</h2>
+        <p className="text-muted-foreground mb-4">No configuration found for agent key: "{name}".</p>
+        <Button onClick={() => navigate('/agents')}>Back to Agents</Button>
+      </div>
+    );
   }
 
-  const handleSave = () => {
-    updateAgent(agent.id, localAgent);
-    setHasUnsaved(false);
+  const handleSave = async () => {
+    setSaveStatus('saving');
+    try {
+      await api.saveAgentPrompt(agentKey, localAgent.systemPrompt);
+      await api.saveAgentConfig(agentKey, localAgent);
+      updateAgent(agentKey, localAgent);
+      setHasUnsaved(false);
+      setSaveStatus('saved');
+      toast.success(`Agent ${localAgent.name} system prompt and configuration saved permanently to database!`);
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (err: any) {
+      setSaveStatus('error');
+      toast.error('Failed to save agent config: ' + (err.message || 'Unknown database error'));
+    }
   };
 
-  const handleResetDefaults = () => {
+  const handleConfirmedReset = async () => {
+    setIsResetting(true);
+    try {
+      const defaultPrompt = await resetPrompt(agentKey);
+      setLocalAgent(prev => prev ? { ...prev, systemPrompt: defaultPrompt } : prev);
+      setHasUnsaved(false);
+      setIsResetDialogOpen(false);
+      setSaveStatus('saved');
+      toast.success(`Agent ${localAgent.name} prompt reset to official master default!`);
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (err: any) {
+      toast.error('Failed to reset prompt: ' + err.message);
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const handleDiscardChanges = () => {
     setLocalAgent(agent);
     setHasUnsaved(false);
+    setSaveStatus('idle');
   };
 
   const updateLocal = (updates: any) => {
     setLocalAgent({ ...localAgent, ...updates });
     setHasUnsaved(true);
+    if (saveStatus !== 'idle') setSaveStatus('idle');
   };
 
   const runPlayground = () => {
@@ -62,23 +139,63 @@ export function AgentConfig() {
   };
 
   const isLLM = localAgent.type === 'llm';
+  const isCustomized = localAgent.systemPrompt.trim() !== localAgent.defaultPrompt.trim();
 
   return (
     <div className="flex-1 overflow-auto p-8 max-w-6xl mx-auto w-full relative">
-      {/* Unsaved changes bar */}
+      {/* Unsaved changes floating bar */}
       {hasUnsaved && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground shadow-2xl border px-6 py-4 rounded-xl flex items-center gap-6 z-50 animate-in slide-in-from-bottom-5">
-          <span className="font-medium text-sm">You have unsaved changes.</span>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <span className="font-medium text-sm">You have unsaved changes in {localAgent.name}.</span>
+          </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleResetDefaults}>Discard</Button>
-            <Button size="sm" onClick={handleSave}><Save className="w-4 h-4 mr-2" /> Save Changes</Button>
+            <Button variant="outline" size="sm" onClick={handleDiscardChanges} disabled={saveStatus === 'saving'}>Discard</Button>
+            <Button size="sm" onClick={handleSave} disabled={saveStatus === 'saving'}>
+              {saveStatus === 'saving' ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
+              ) : (
+                <><Save className="w-4 h-4 mr-2" /> Save to Database</>
+              )}
+            </Button>
           </div>
         </div>
       )}
 
+      {/* Confirmation Dialog for Reset */}
+      <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Reset System Prompt to Master Default?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground pt-2">
+              Are you sure you want to revert the system prompt for <strong>{localAgent.name}</strong> to the official master default?
+              <br /><br />
+              This action will permanently overwrite any customized instructions you have saved in the database for this agent.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmedReset}
+              disabled={isResetting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isResetting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Confirm Reset
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/agents')} className="-ml-2"><ArrowRight className="w-4 h-4 rotate-180" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/agents')} className="-ml-2">
+            <ArrowRight className="w-4 h-4 rotate-180" />
+          </Button>
           <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
             {localAgent.type === 'code' ? <Terminal className="w-6 h-6" /> : <Bot className="w-6 h-6" />}
           </div>
@@ -88,6 +205,10 @@ export function AgentConfig() {
               <span className="uppercase tracking-wider font-semibold">{localAgent.type} Agent</span>
               <span>•</span>
               <span className="font-mono">{localAgent.model}</span>
+              <span>•</span>
+              <Badge variant="outline" className={isCustomized ? "bg-amber-500/10 text-amber-600 border-amber-500/20" : "bg-primary/10 text-primary"}>
+                {isCustomized ? "Customized Prompt" : "Default Master Prompt"}
+              </Badge>
             </div>
           </div>
         </div>
@@ -208,22 +329,61 @@ export function AgentConfig() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <h3 className="font-semibold text-lg">System Prompt</h3>
-                {localAgent.systemPrompt === localAgent.defaultPrompt ? (
-                  <Badge variant="outline" className="bg-primary/10 text-primary">Default</Badge>
+                {!isCustomized ? (
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                    Official Master Default
+                  </Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-orange-500/10 text-orange-600">Customized</Badge>
+                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+                    Customized (Saved in Database)
+                  </Badge>
+                )}
+                {saveStatus === 'saved' && (
+                  <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Saved to DB
+                  </Badge>
+                )}
+                {saveStatus === 'error' && (
+                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 flex items-center gap-1">
+                    <XCircle className="w-3 h-3" /> Save Failed
+                  </Badge>
                 )}
               </div>
-              <Button variant="outline" size="sm" onClick={() => updateLocal({ systemPrompt: localAgent.defaultPrompt })}>
-                <RotateCcw className="w-4 h-4 mr-2" /> Reset to Default
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setIsResetDialogOpen(true)}
+                  disabled={saveStatus === 'saving' || isResetting}
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" /> Reset to Default
+                </Button>
+                <Button 
+                  size="sm" 
+                  onClick={handleSave} 
+                  disabled={saveStatus === 'saving'} 
+                  className="bg-primary text-primary-foreground min-w-[120px]"
+                >
+                  {saveStatus === 'saving' ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
+                  ) : saveStatus === 'saved' ? (
+                    <><CheckCircle2 className="w-4 h-4 mr-2 text-green-300" /> Saved!</>
+                  ) : (
+                    <><Save className="w-4 h-4 mr-2" /> Save Prompt</>
+                  )}
+                </Button>
+              </div>
             </div>
             
             <Card className="overflow-hidden border-2 focus-within:border-primary transition-colors">
+              <div className="bg-muted/40 border-b px-4 py-2 flex items-center justify-between text-xs text-muted-foreground font-mono">
+                <span>Prompt Length: {localAgent.systemPrompt.length.toLocaleString()} characters ({localAgent.systemPrompt.split('\n').length} lines)</span>
+                <span>Active Agent: {localAgent.id}</span>
+              </div>
               <Textarea 
                 value={localAgent.systemPrompt}
                 onChange={(e) => updateLocal({ systemPrompt: e.target.value })}
-                className="min-h-[400px] border-0 focus-visible:ring-0 rounded-none font-mono text-sm leading-relaxed p-6 resize-none"
+                className="min-h-[460px] border-0 focus-visible:ring-0 rounded-none font-mono text-xs md:text-sm leading-relaxed p-6 resize-none"
                 placeholder="Enter system instructions..."
               />
             </Card>

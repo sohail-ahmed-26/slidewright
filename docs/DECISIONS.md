@@ -1,21 +1,38 @@
-# Decisions log
-(Antigravity yahan har technical faisla likhega: tareekh, faisla, wajah.)
+# Architecture Decisions
 
-## 2026-10-10
-**Faisla**: Setup npm workspaces for `frontend`, `backend`, `shared`, and `agents`.
-**Wajah**: To allow sharing of types and logic across all layers without publishing packages or using complex monorepo tools.
+## PPTX Export Strategy (Task B2)
 
-**Faisla**: Use Vite for the frontend React app and `tsx watch` for the Express backend. Use `concurrently` to run both in the `npm run dev` script.
-**Wajah**: Simplifies the developer experience, allowing the entire stack to run locally with a single command without Docker (except for Postgres).
+### Context & Problem
+We need to export generated presentations to native PowerPoint (.pptx) format. The design system leverages modern CSS (flexbox, grid, gradients, rounded corners, drop shadows, absolute positioning) to render slides beautifully in the browser. 
 
-**Faisla**: Only rely on OpenRouter API for all LLM calls. Implemented a central OpenRouter wrapper in `agents/llm/openrouter.ts` capable of calling Text, Vision, and Image models.
-**Wajah**: Avoids vendor lock-in and allows easy swapping of models based on user configuration, fulfilling the strict rules of the project.
+We spiked two DOM-based approaches:
+1. **html2pptx (npm package)**: Parses HTML and translates it to PPTX objects.
+2. **Custom DOM Extractor (Playwright)**: Renders the deck in headless Chromium, extracts exact bounding boxes (`getBoundingClientRect`) and computed styles of elements marked with `[data-pptx]`, and maps them to `pptxgenjs` objects.
 
-**Faisla**: Implemented Mock Mode in `callLLM` and `generateImage` that defaults to returning fixtures.
-**Wajah**: Required by project rules to ensure the app functions without any network requests or API keys when `USE_MOCK_LLM=true`.
+### Evaluation of DOM Approaches
+- `html2pptx` fails significantly on modern CSS layouts like grids and flexbox, resulting in low fidelity (<4/10).
+- The **Playwright DOM Extractor** achieves better positioning but falls short on:
+  - SVG icons (lucide-react).
+  - Background gradients and image object-fit (cover).
+  - Text wrapping and precise font metrics (browser vs. PowerPoint rendering differences).
+  - High operational overhead (requires running a headless browser in the backend container, which is heavy and error-prone in serverless/Docker environments).
 
-**Faisla**: Use `pages/` and `components/` instead of a domain-driven `features/` structure in the frontend.
-**Wajah**: For a straightforward application size, flattening components and pages is simpler and adheres to standard Vite/React scaffolding patterns without over-engineering.
+### Decision
+Neither DOM approach reaches a consistent fidelity of >= 8/10 for highly designed, token-based layouts.
 
-**Faisla**: Fall back to layout-specific `pptxgenjs` mapping fed by the same tokens for PPTX export instead of `html2pptx` or DOM Extractor.
-**Wajah**: `html2pptx` is outdated and cannot handle complex layouts accurately. The DOM Extractor via Playwright is prone to environmental dependency issues (e.g., 404 driver downloads on Windows). The custom `pptxgenjs` approach natively guarantees high fidelity for our specific layout templates without external browser dependencies.
+Therefore, we have decided to **fall back to layout-specific `pptxgenjs` mapping fed by the same tokens**.
+
+### Implementation (Layout-Specific Mapping)
+Instead of scraping the DOM, the backend export module (`backend/src/export/`) will read the parsed JSON `Deck` object (the exact same data that feeds the React components) and use `pptxgenjs` to manually draw the shapes, text, and images for each specific layout (e.g., `cover`, `grid_2x2`, `timeline`).
+
+**Advantages:**
+1. **100% Reliability**: No headless browser dependency. Extremely fast and lightweight.
+2. **High Fidelity**: By explicitly hardcoding the grid coordinates (e.g., `x, y, w, h`) and mapping our design tokens (colors, fonts) into `pptxgenjs` directly, we ensure pixel-perfect alignment.
+3. **Native PPTX Features**: We can map background colors, shape shadows (`offset >= 0`), transparency, and proper `charSpacing`.
+
+### Constraints for `pptxgenjs` Builder
+- `pres.layout = 'LAYOUT_16x9'` (13.333x7.5 inches) before adding slides.
+- Colors must be hex without the `#` symbol.
+- Transparency must use the `transparency` option rather than rgba hex codes.
+- Shadows must be defined per shape (cannot use CSS drop-shadow).
+- Character spacing uses `charSpacing`, not `letterSpacing`.

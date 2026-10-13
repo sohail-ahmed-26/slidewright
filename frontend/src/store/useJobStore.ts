@@ -41,12 +41,13 @@ export interface Job {
 
 interface JobState {
   jobs: Record<string, Job>;
-  createJob: (settings: any, simulateFailure: boolean) => string;
+  createJob: (settings: any, simulateFailure: boolean) => Promise<string>;
   cancelJob: (id: string) => void;
   retryJob: (id: string) => void;
   _processJob: (id: string) => void;
   _updateStep: (id: string, stepId: string, updates: Partial<JobStep>) => void;
   _addLog: (id: string, log: Omit<LogEntry, 'id' | 'timestamp'>) => void;
+  _setJobFromServer: (jobData: any) => void;
 }
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -99,11 +100,107 @@ export const useJobStore = create<JobState>((set, get) => ({
     });
   },
 
-  createJob: (settings, simulateFailure) => {
-    // This will be properly triggered via component, returning a mock ID temporarily 
-    // until we wire up the full creation flow to the backend in the component.
-    // The components will use api.createDeck() directly.
-    return ''; 
+  _setJobFromServer: (serverJob) => {
+    set(state => {
+      // Map serverJob.runs to steps
+      const existingJob = state.jobs[serverJob.id] || { 
+        id: serverJob.id, steps: initialSteps(), logs: [], settings: {} 
+      };
+      
+      const newSteps = { ...existingJob.steps };
+      let progress = 0;
+      
+      if (serverJob.runs) {
+        serverJob.runs.forEach((r: any) => {
+           if (newSteps[r.agent]) {
+             let parsedOutput = undefined;
+             if (r.output) {
+               try { parsedOutput = JSON.parse(r.output); } catch(e) { parsedOutput = r.output; }
+             }
+             newSteps[r.agent] = {
+               ...newSteps[r.agent],
+               status: r.status,
+               elapsedMs: r.ms || 0,
+               tokensIn: r.tokensIn || 0,
+               tokensOut: r.tokensOut || 0,
+               outputJson: parsedOutput
+             };
+           }
+        });
+      }
+
+      // Ensure orchestrator and active stages reflect status correctly
+      if (serverJob.status === 'done') {
+        progress = 100;
+        if (newSteps.orchestrator) newSteps.orchestrator.status = 'done';
+        if (newSteps.export) newSteps.export.status = 'done';
+      } else if (serverJob.status === 'running' || serverJob.currentStage) {
+        if (newSteps.orchestrator) newSteps.orchestrator.status = 'done';
+        if (serverJob.currentStage === 'plan') {
+          progress = 25;
+          if (newSteps.writer?.status !== 'done') newSteps.writer.status = 'running';
+          if (newSteps.designer?.status !== 'done') newSteps.designer.status = 'running';
+        } else if (serverJob.currentStage === 'visuals') {
+          progress = 50;
+          if (newSteps.writer) newSteps.writer.status = 'done';
+          if (newSteps.designer) newSteps.designer.status = 'done';
+          if (newSteps.visuals?.status !== 'done') newSteps.visuals.status = 'running';
+        } else if (serverJob.currentStage === 'critic') {
+          progress = 75;
+          if (newSteps.writer) newSteps.writer.status = 'done';
+          if (newSteps.designer) newSteps.designer.status = 'done';
+          if (newSteps.visuals) newSteps.visuals.status = 'done';
+          if (newSteps.critic?.status !== 'done') newSteps.critic.status = 'running';
+        } else if (serverJob.currentStage === 'export') {
+          progress = 90;
+          if (newSteps.writer) newSteps.writer.status = 'done';
+          if (newSteps.designer) newSteps.designer.status = 'done';
+          if (newSteps.visuals) newSteps.visuals.status = 'done';
+          if (newSteps.critic) newSteps.critic.status = 'done';
+          if (newSteps.export?.status !== 'done') newSteps.export.status = 'running';
+        } else if (serverJob.currentStage === 'ready') {
+          progress = 100;
+          Object.keys(newSteps).forEach(k => {
+            if (newSteps[k].status !== 'failed') newSteps[k].status = 'done';
+          });
+        }
+      }
+
+      return {
+        jobs: {
+          ...state.jobs,
+          [serverJob.id]: {
+            ...existingJob,
+            status: serverJob.status === 'done' ? 'completed' : serverJob.status,
+            deckId: serverJob.deckId,
+            currentStage: serverJob.currentStage,
+            progress,
+            steps: newSteps
+          }
+        }
+      };
+    });
+  },
+
+  createJob: async (settings, simulateFailure) => {
+    const res = await api.createDeck(settings);
+    set(state => ({
+      jobs: {
+        ...state.jobs,
+        [res.jobId]: {
+          id: res.jobId,
+          status: 'pending',
+          deckId: res.deck.id,
+          startTime: Date.now(),
+          progress: 0,
+          simulateFailure,
+          steps: initialSteps(),
+          logs: [],
+          settings
+        }
+      }
+    }));
+    return res.jobId;
   },
 
   cancelJob: async (id) => {

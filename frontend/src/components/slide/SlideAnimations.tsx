@@ -91,8 +91,9 @@ import { useSpring, useTransform, animate } from 'framer-motion';
 
 export function AnimCountUp({ value, className }: { value: string, className?: string }) {
   const { exportMode } = useSlideContext();
-  const num = parseFloat(value.replace(/[^0-9.]/g, ''));
-  const suffix = value.replace(/[0-9.]/g, '');
+  const safeValue = String(value || '');
+  const num = parseFloat(safeValue.replace(/[^0-9.]/g, ''));
+  const suffix = safeValue.replace(/[0-9.]/g, '');
   
   const nodeRef = React.useRef<HTMLSpanElement>(null);
 

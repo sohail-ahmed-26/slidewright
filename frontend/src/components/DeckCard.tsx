@@ -27,13 +27,18 @@ export function DeckCard({ deck }: { deck: Deck }) {
   const [deleteOpen, setDeleteOpen] = React.useState(false);
 
   // Use semantic classes for badges based on the new CSS variables
-  const statusColor = deck.status === 'ready' ? 'bg-success text-success-foreground' : 
-                      deck.status === 'running' ? 'bg-info text-info-foreground' : 
-                      'bg-warning text-warning-foreground';
+  const statusColor = deck.status === 'ready' || deck.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
+                      deck.status === 'running' || deck.status === 'In Progress' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
+                      'bg-slate-500/10 text-slate-400 border border-slate-500/20';
+
+  const statusLabel = deck.status === 'ready' ? 'Completed' :
+                      deck.status === 'running' ? 'In Progress' :
+                      deck.status === 'draft' ? 'Draft' :
+                      deck.status;
 
   return (
     <>
-      <Card className="group overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 border bg-card flex flex-col" onClick={() => navigate(`/decks/${deck.id}`)}>
+      <Card className="group overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-200 border bg-card flex flex-col" onClick={() => navigate(`/decks/${deck.id}`)}>
         {/* Thumbnail container */}
         <div className="relative aspect-video bg-muted/30 border-b overflow-hidden">
           {deck.slides && deck.slides[0] ? (
@@ -56,8 +61,8 @@ export function DeckCard({ deck }: { deck: Deck }) {
         <div className="p-4 flex flex-col flex-1">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <Badge variant="secondary" className={cn("mb-2 text-[10px] font-medium tracking-wide uppercase px-2 py-0.5", statusColor)}>
-                {deck.status}
+              <Badge variant="secondary" className={cn("mb-2 text-[11px] font-medium tracking-wide px-2 py-0.5", statusColor)}>
+                {statusLabel}
               </Badge>
               <h3 className="font-semibold text-base line-clamp-1 text-foreground">{deck.title}</h3>
               <p className="text-xs text-muted-foreground mt-1">
@@ -89,7 +94,7 @@ export function DeckCard({ deck }: { deck: Deck }) {
                   try {
                     toast.info("Exporting PPTX...");
                     const { api } = await import('../lib/api');
-                    const url = await api.exportPptx(deck.id);
+                    const url = await api.exportPptx(deck.id, deck);
                     toast.success("PPTX Export complete!");
                     window.location.href = url;
                   } catch (e: any) {

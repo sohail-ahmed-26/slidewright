@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useJobStore, JobStep } from '../store/useJobStore';
 import { useDeckStore } from '../store/useDeckStore';
+import { api } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Progress } from '../components/ui/progress';
 import { Badge } from '../components/ui/badge';
@@ -31,10 +32,61 @@ export function RunJob() {
   const cancelJob = useJobStore(s => s.cancelJob);
   const retryJob = useJobStore(s => s.retryJob);
   
+  const _setJobFromServer = useJobStore(s => s._setJobFromServer);
+  const _addDeck = useDeckStore(s => s.addDeck);
+  const _updateDeck = useDeckStore(s => s.updateDeck);
+  
   const deck = useDeckStore(s => s.decks.find(d => d.id === job?.deckId));
   const [logFilter, setLogFilter] = useState('all');
 
-  if (!job) return <div className="p-8 text-center text-red-500">Job not found</div>;
+  const fetchAndSetDeck = async (deckId: string) => {
+    const d = await api.getDeck(deckId);
+    if (!d || d.error) return;
+    const slides = (Array.isArray(d.slides) && d.slides.length > 0)
+      ? d.slides
+      : (d.data?.slides || []);
+    const formattedDeck = {
+      id: d.id,
+      title: d.title || 'Untitled',
+      status: d.status,
+      createdAt: d.createdAt,
+      slides,
+      theme: d.theme || d.design?.theme || {}
+    };
+    
+    const store = useDeckStore.getState();
+    if (store.decks.find(x => x.id === d.id)) {
+      _updateDeck(d.id, formattedDeck);
+    } else {
+      _addDeck(formattedDeck);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!jobId) return;
+    
+    // Initial fetch
+    api.getRun(jobId).then(data => {
+      if (data && !data.error) {
+        _setJobFromServer(data);
+        if (data.deckId) fetchAndSetDeck(data.deckId);
+      }
+    });
+
+    // Subscribe
+    const unsubscribe = api.subscribeRun(jobId, (data) => {
+      if (data && !data.error) {
+        _setJobFromServer(data);
+        if (data.deckId) fetchAndSetDeck(data.deckId);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [jobId]);
+
+  if (!job) return <div className="p-8 text-center text-muted-foreground flex flex-col items-center gap-4 mt-20"><Loader2 className="w-8 h-8 animate-spin" /> Loading Job...</div>;
 
   const renderNode = (stepId: string) => {
     const step = job.steps[stepId];
@@ -234,11 +286,11 @@ export function RunJob() {
         <div className="w-1/2 flex flex-col bg-muted/40 p-8 min-w-0">
           <div className="mb-4 flex items-center justify-between shrink-0">
             <h3 className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4 text-primary" /> Live Preview</h3>
-            {deck && <Badge variant="secondary">{deck.slides.length} slides generated</Badge>}
+            {deck && <Badge variant="secondary">{deck.slides?.length || 0} slides generated</Badge>}
           </div>
           
           <div className="flex-1 flex items-center justify-center overflow-hidden border rounded-xl bg-card shadow-sm relative">
-            {deck && deck.slides.length > 0 ? (
+            {deck && (deck.slides?.length || 0) > 0 ? (
               <div className="w-full h-full p-8 flex items-center justify-center relative bg-muted/20">
                 <div className="w-full max-w-full aspect-video shadow-xl relative overflow-hidden bg-white ring-1 ring-border">
                   {/* Just show the first slide as a live preview */}

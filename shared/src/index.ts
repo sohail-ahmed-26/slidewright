@@ -8,3 +8,5 @@ export * from './design/fonts';
 export * from './design/palette';
 export * from './design/icons';
 export * from './canvas';
+export * from './prompts';
+export * from './images';

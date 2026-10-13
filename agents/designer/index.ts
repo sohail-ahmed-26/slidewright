@@ -10,6 +10,7 @@ export interface DesignerOptions {
   audience: string;
   tone: string;
   themeHint?: string;
+  customPrompt?: string;
   mockMode?: boolean;
 }
 
@@ -50,7 +51,7 @@ function hueDistance(h1: number, h2: number) {
 }
 
 export async function runDesigner(options: DesignerOptions): Promise<DesignerOutput> {
-  const systemPrompt = getDesignerSystemPrompt();
+  const systemPrompt = getDesignerSystemPrompt(options.customPrompt);
   const previousDesigns = getPreviousDesigns();
   const previousStr = JSON.stringify(previousDesigns);
 

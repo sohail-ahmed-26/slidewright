@@ -6,7 +6,7 @@ import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Search, LayoutGrid, List as ListIcon, Trash2, FilePlus2, Loader2, AlertCircle } from 'lucide-react';
+import { Search, LayoutGrid, List as ListIcon, Trash2, FilePlus2, Loader2, AlertCircle, Library as LibraryIcon } from 'lucide-react';
 import { Checkbox } from '../components/ui/checkbox';
 import { Skeleton } from '../components/ui/skeleton';
 
@@ -22,23 +22,32 @@ export function Library() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Mock loading/error
   React.useEffect(() => {
     setIsLoading(true);
-    const t = setTimeout(() => setIsLoading(false), 600);
-    return () => clearTimeout(t);
+    import('../lib/api').then(({ api }) => {
+      api.listDecks().then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const { addDeck } = useDeckStore.getState();
+          data.forEach(d => addDeck(d));
+        }
+      }).catch(err => {
+        console.warn("Could not fetch remote decks, using local store:", err);
+      }).finally(() => {
+        setIsLoading(false);
+      });
+    });
   }, []);
 
   const filteredDecks = useMemo(() => {
-    let result = decks.filter(d => d.title.toLowerCase().includes(search.toLowerCase()));
+    let result = decks.filter(d => (d.title || '').toLowerCase().includes(search.toLowerCase()));
     
     if (statusFilter !== 'all') {
       result = result.filter(d => d.status === statusFilter);
     }
     
     result.sort((a, b) => {
-      if (sort === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (sort === 'name') return a.title.localeCompare(b.title);
+      if (sort === 'newest') return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      if (sort === 'name') return (a.title || '').localeCompare(b.title || '');
       if (sort === 'slides') return (b.slides?.length || 0) - (a.slides?.length || 0);
       return 0;
     });
@@ -151,7 +160,7 @@ export function Library() {
         </div>
       ) : filteredDecks.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center p-12 text-center border-2 border-dashed rounded-xl">
-          <Library className="w-12 h-12 text-muted-foreground mb-4" />
+          <LibraryIcon className="w-12 h-12 text-muted-foreground mb-4" />
           <h2 className="text-xl font-bold mb-2">No presentations found</h2>
           <p className="text-muted-foreground mb-6">Create a new presentation or adjust your filters.</p>
           <Button onClick={() => navigate('/new')}>Create Presentation</Button>

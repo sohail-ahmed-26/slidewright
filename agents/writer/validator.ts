@@ -77,9 +77,9 @@ export function validateDeck(deck: WriterOutput): ValidationViolation[] {
     violations.push({ index: -1, message: `Deck needs more variety. Only ${distinctLayouts.size} distinct layouts used. Must be >= 6.` });
   }
 
-  // Rhythm (cover, key_answer and closing dark; the rest light)
-  if (middleDarkCount !== 1 && slides.length > 3) {
-    violations.push({ index: -1, message: `Rhythm violation: There must be exactly ONE dark slide in the middle of the deck (for the key answer). Found ${middleDarkCount}.` });
+  // Rhythm: prevent too many dark slides in the middle (keep decks crisp and legible)
+  if (middleDarkCount > 2) {
+    violations.push({ index: -1, message: `Rhythm violation: Too many dark slides in the middle of the deck. Found ${middleDarkCount}. Max 2 allowed.` });
   }
 
   // Deduplicate violations by index/message

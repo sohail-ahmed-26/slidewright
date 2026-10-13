@@ -11,6 +11,11 @@ const PIPELINE_ORDER = ['orchestrator', 'writer', 'designer', 'visuals', 'critic
 export function Agents() {
   const navigate = useNavigate();
   const agents = useAgentStore(s => s.agents);
+  const fetchPromptsFromServer = useAgentStore(s => s.fetchPromptsFromServer);
+
+  React.useEffect(() => {
+    fetchPromptsFromServer().catch(console.error);
+  }, []);
 
   return (
     <div className="flex-1 overflow-auto p-8 max-w-[1200px] mx-auto w-full flex flex-col">
@@ -37,15 +42,20 @@ export function Agents() {
             <Card key={id} className="flex flex-col border p-6 relative group hover:shadow-md transition-all">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${agent.type === 'code' ? 'bg-secondary text-secondary-foreground' : 'bg-primary text-primary-foreground'}`}>
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white ${
+                    id === 'orchestrator' || id === 'writer' || id === 'visuals' ? 'bg-blue-600' :
+                    id === 'designer' ? 'bg-purple-600' :
+                    id === 'critic' ? 'bg-red-600' :
+                    'bg-orange-600'
+                  }`}>
                     {agent.type === 'code' ? <Terminal className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                   </div>
                   <h3 className="font-semibold text-foreground text-lg">{agent.name}</h3>
                 </div>
                 {!agent.enabled ? (
-                  <span className="text-xs font-semibold text-muted-foreground">Disabled</span>
+                  <Badge variant="outline" className="text-muted-foreground">Disabled</Badge>
                 ) : (
-                  <span className="text-xs font-semibold text-green-500">Enabled</span>
+                  <Badge variant="outline" className="text-green-500 border-green-500/30 bg-green-500/10">Enabled</Badge>
                 )}
               </div>
 

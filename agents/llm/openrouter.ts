@@ -6,6 +6,7 @@ export interface OpenRouterOptions {
   userPrompt: string;
   mockMode?: boolean;
   temperature?: number;
+  maxTokens?: number;
 }
 
 export async function callLLM(options: OpenRouterOptions): Promise<string> {
@@ -31,6 +32,7 @@ export async function callLLM(options: OpenRouterOptions): Promise<string> {
     body: JSON.stringify({
       model: options.model,
       temperature: options.temperature ?? 0.7,
+      max_tokens: options.maxTokens ?? 3000,
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: options.systemPrompt },

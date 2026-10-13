@@ -1,19 +1,39 @@
+import { DEFAULT_VISUAL_PROMPT } from '@slidewright/shared';
+
 export function getVisualsSystemPrompt(overriddenPrompt?: string): string {
-  const basePrompt = overriddenPrompt || `You are the VISUALS DIRECTOR. A weak, generic or irrelevant picture is worse than none. 
-For each slide marked needsDiagram: pick the simplest type that shows the relationship, keep it to the slide's own content, never add invented facts. Diagram types: flow, cycle, timeline, hierarchy, matrix_2x2, venn, layers, funnel. Max 7 nodes (6 for flow/cycle). Label max 3 words.
-For each slide marked needsImage: use an image only for a real place, object, person, process or atmosphere the slide is about; for abstract ideas return useImage:false with fallback "icon_composition". 
-Output ONLY JSON matching this exact schema. Do not include a 'diagram' key for image slides, and do not include an 'image' key for diagram slides:
+  const promptToUse = (overriddenPrompt && overriddenPrompt.trim() && overriddenPrompt.trim() !== 'Default prompt')
+    ? overriddenPrompt.trim()
+    : DEFAULT_VISUAL_PROMPT;
+
+  const technicalSchemaAppendix = `
+
+[TECHNICAL SCHEMA SPECIFICATION]
+Output ONLY valid JSON matching this exact schema:
 {
   "slides": [
     {
-      "slideId": "s1-1",
-      "diagram": { "type": "flow", "nodes": [{"id": "1", "label": "Start"}], "caption": "Flow", "altText": "Flow diagram" }
-    },
-    {
-      "slideId": "s1-2",
-      "image": { "useImage": true, "prompt": "a cute baby dragon", "alt": "A dragon", "placement": "left" }
+      "slideId": "string",
+      "diagram": {
+        "type": "flow" | "cycle" | "timeline" | "hierarchy" | "matrix_2x2" | "venn" | "layers" | "funnel",
+        "nodes": [
+          { "id": "1", "label": "Short Label", "icon": "LucideIconName" }
+        ],
+        "caption": "Optional Caption",
+        "altText": "Descriptive Alt Text"
+      },
+      "image": {
+        "useImage": true,
+        "prompt": "Detailed photorealistic / illustrative prompt",
+        "fallback": "icon_composition" | "none",
+        "alt": "Image description",
+        "placement": "left" | "right" | "background" | "center"
+      }
     }
   ]
-}`;
-  return basePrompt;
 }
+Note: If a slide uses a diagram, set image to null. If it uses an image, set diagram to null. If neither is needed, set both to null.
+`;
+
+  return promptToUse + technicalSchemaAppendix;
+}
+

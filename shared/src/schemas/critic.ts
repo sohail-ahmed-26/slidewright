@@ -9,10 +9,11 @@ export const CriticIssueSchema = z.object({
 });
 
 export const CriticLLMOutputSchema = z.object({
-  score: z.number().min(0).max(10),
+  score: z.number().min(0).max(100),
   feedback: z.string(),
-  issues: z.array(CriticIssueSchema),
-  approved: z.boolean(),
+  criterionScores: z.record(z.string(), z.number()).optional(),
+  issues: z.array(CriticIssueSchema).default([]),
+  approved: z.boolean().optional(),
 });
 
 export type CriticLLMOutput = z.infer<typeof CriticLLMOutputSchema>;
