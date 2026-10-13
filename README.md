@@ -44,7 +44,7 @@
 
 <div align="center">
   <h3>🖥️ Executive Canvas & Real-Time Slide Studio</h3>
-  <img src="outputs/screenshots/decks-deck-1-1920-dark.png" alt="Slidewright Studio Canvas" width="95%" />
+  <img src="screenshots/5.jpg" alt="Slidewright Studio Canvas" width="100%" />
   <p><em>Interactive 16:9 high-resolution slide editor with dynamic canvas scaling, live speaker notes, and instant layout switching.</em></p>
 </div>
 
@@ -55,31 +55,47 @@
     <td width="50%">
       <div align="center">
         <h4>⚡ Generation Studio</h4>
-        <img src="outputs/screenshots/new-1920-dark.png" alt="New Deck Generator" width="100%" />
+        <img src="screenshots/1.jpg" alt="New Deck Generator" width="100%" />
         <p><em>Audience, Tone, Slide Count & Topic Prompting</em></p>
       </div>
     </td>
     <td width="50%">
       <div align="center">
-        <h4>🤖 Multi-Agent Orchestration Hub</h4>
-        <img src="outputs/screenshots/runs-run-1-1920-dark.png" alt="Live Multi-Agent Pipeline" width="100%" />
-        <p><em>Real-Time Stream of Writer, Designer, Visuals & Critic Runs</em></p>
+        <h4>📂 Slide Presentation Library</h4>
+        <img src="screenshots/2.jpg" alt="Deck Library" width="100%" />
+        <p><em>Manage, duplicate, rename, preview, and download PPTX decks</em></p>
       </div>
     </td>
   </tr>
   <tr>
     <td width="50%">
       <div align="center">
-        <h4>⚙️ AI Agent Prompt Customizer</h4>
-        <img src="outputs/screenshots/agents-1920-dark.png" alt="Agent Customization Hub" width="100%" />
-        <p><em>Inspect, edit, and permanently persist custom agent system prompts</em></p>
+        <h4>🤖 Multi-Agent Orchestration Hub</h4>
+        <img src="screenshots/3.jpg" alt="Agents Dashboard" width="100%" />
+        <p><em>Pipeline status across Orchestrator, Writer, Designer, Visuals, Critic & Export</em></p>
       </div>
     </td>
     <td width="50%">
       <div align="center">
-        <h4>📂 Slide Presentation Library</h4>
-        <img src="outputs/screenshots/library-1920-dark.png" alt="Deck Library" width="100%" />
-        <p><em>Manage, duplicate, rename, preview, and download PPTX decks</em></p>
+        <h4>⚙️ AI Agent Prompt & Schema Customizer</h4>
+        <img src="screenshots/7.jpg" alt="Agent Customization Hub" width="100%" />
+        <p><em>Inspect, edit, and permanently persist custom agent system prompts & Zod schemas</em></p>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <div align="center">
+        <h4>📊 Executive Content & Layout Density</h4>
+        <img src="screenshots/6.jpg" alt="Three Column Content Layout" width="100%" />
+        <p><em>Well-structured multi-column cards, clear typography, and strong contrast</em></p>
+      </div>
+    </td>
+    <td width="50%">
+      <div align="center">
+        <h4>🛠️ Engine Settings & Provider Config</h4>
+        <img src="screenshots/4.jpg" alt="Engine Settings" width="100%" />
+        <p><em>OpenRouter model selection, mock testing mode, and storage management</em></p>
       </div>
     </td>
   </tr>
